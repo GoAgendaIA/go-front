@@ -1,7 +1,6 @@
 import { DatePipe, KeyValuePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import {
   AdminBusiness,
@@ -13,7 +12,6 @@ import {
   MetricsResponse
 } from '../../../core/models/goagenda.models';
 import { GoagendaApiService } from '../../../core/services/goagenda-api.service';
-import { SupabaseAuthService } from '../../../core/services/supabase-auth.service';
 import { BarChartComponent, BarChartSeries } from '../../../shared/components/bar-chart/bar-chart.component';
 import { DonutChartComponent, DonutSlice } from '../../../shared/components/donut-chart/donut-chart.component';
 import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
@@ -93,8 +91,6 @@ function shiftDays(isoDate: string, days: number): string {
 })
 export class AnalyticsPageComponent implements OnInit {
   private readonly apiService = inject(GoagendaApiService);
-  private readonly authService = inject(SupabaseAuthService);
-  private readonly router = inject(Router);
 
   // --- filtros ---
   readonly preset = signal<PeriodPreset>('30');
@@ -109,7 +105,6 @@ export class AnalyticsPageComponent implements OnInit {
   readonly businesses = signal<AdminBusiness[]>([]);
   readonly data = signal<MetricsResponse | null>(null);
   readonly isLoading = signal(false);
-  readonly isLoggingOut = signal(false);
   readonly error = signal('');
 
   readonly isGlobal = computed(() => !this.businessId());
@@ -366,20 +361,5 @@ export class AnalyticsPageComponent implements OnInit {
 
   weekTotal(row: MetricsBusinessRow): number {
     return row.citas_por_semana[0] ?? 0;
-  }
-
-  goBack(): void {
-    void this.router.navigateByUrl('/admin');
-  }
-
-  async logout(): Promise<void> {
-    this.isLoggingOut.set(true);
-
-    try {
-      await this.authService.signOut();
-      await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
-    } finally {
-      this.isLoggingOut.set(false);
-    }
   }
 }

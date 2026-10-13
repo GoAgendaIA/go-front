@@ -1,0 +1,32 @@
+<div class="shell-layout">
+  <header class="topbar">
+    <div class="brand-wrap">
+      <img src="/Logo.png" alt="GoAgenda" class="brand-logo" />
+      <span class="role-tag">Administracion</span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <button type="button" class="logout-btn" (click)="logout()" [disabled]="isLoggingOut()">
+      <app-lucide-icon name="log-out" [size]="18" [strokeWidth]="2" />
+      <span>{{ isLoggingOut() ? 'Cerrando sesion...' : 'Cerrar sesion' }}</span>
+    </button>
+  </header>
+
+  <main class="content-panel">
+    <router-outlet />
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navegacion de administracion">
+    <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <app-lucide-icon name="chart-column" [size]="22" [strokeWidth]="2" />
+      <span>Analitica</span>
+    </a>
+    <a routerLink="/admin/negocios" routerLinkActive="active">
+      <app-lucide-icon name="store" [size]="22" [strokeWidth]="2" />
+      <span>Negocios</span>
+    </a>
+    <a routerLink="/admin/usuarios" routerLinkActive="active">
+      <app-lucide-icon name="users" [size]="22" [strokeWidth]="2" />
+      <span>Usuarios</span>
+    </a>
+  </nav>
+</div>

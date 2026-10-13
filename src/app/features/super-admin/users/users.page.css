@@ -1,0 +1,163 @@
+:host {
+  display: block;
+}
+
+.page-body {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1.1rem 1.15rem 3rem;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  margin: 0 0 0.2rem;
+  color: var(--go-navy);
+  font-size: 1.6rem;
+}
+
+.page-header p {
+  margin: 0;
+  color: color-mix(in srgb, var(--go-dark) 62%, white);
+  font-size: 0.92rem;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--go-dark) 62%, white);
+  line-height: 1.4;
+}
+
+.error-banner,
+.success-banner {
+  margin: 0;
+  border-radius: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.88rem;
+}
+
+.error-banner {
+  border: 1px solid color-mix(in srgb, #bd2e2e 28%, white);
+  background: color-mix(in srgb, #bd2e2e 8%, white);
+  color: #7f2121;
+}
+
+.success-banner {
+  border: 1px solid color-mix(in srgb, var(--go-teal) 30%, white);
+  background: color-mix(in srgb, var(--go-teal) 9%, white);
+  color: #055f49;
+}
+
+.hint-text {
+  color: color-mix(in srgb, var(--go-dark) 60%, white);
+  font-size: 0.92rem;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.user-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.user-card {
+  background: #fff;
+  border-radius: var(--go-radius-lg);
+  box-shadow: 0 4px 14px rgb(16 32 64 / 6%);
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--go-teal) 14%, white);
+  color: var(--go-teal);
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-info h3 {
+  margin: 0 0 0.15rem;
+  color: var(--go-navy);
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.user-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--go-dark) 60%, white);
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 0.22rem 0.6rem;
+  background: color-mix(in srgb, var(--go-teal) 14%, white);
+  color: var(--go-teal);
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.badge-neutral {
+  background: color-mix(in srgb, var(--go-dark) 12%, white);
+  color: color-mix(in srgb, var(--go-dark) 70%, white);
+}
+
+.confirm-body {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.confirm-body p {
+  margin: 0;
+  color: var(--go-charcoal);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.confirm-body .note {
+  font-size: 0.85rem;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+@media (max-width: 520px) {
+  .user-card {
+    flex-wrap: wrap;
+  }
+}
+
+.modal-form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+@media (min-width: 900px) {
+  .page-body {
+    padding: 1.5rem 2rem 2.5rem;
+  }
+}

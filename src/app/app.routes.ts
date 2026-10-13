@@ -30,8 +30,10 @@ import { MyHoursPageComponent } from './features/employee/hours/my-hours.page';
 import { MyServicesPageComponent } from './features/employee/services/my-services.page';
 import { MyProfilePageComponent } from './features/employee/profile/my-profile.page';
 import { RedeemCodePageComponent } from './features/onboarding/redeem-code/redeem-code.page';
+import { AdminShellPageComponent } from './features/super-admin/admin-shell/admin-shell.page';
 import { AnalyticsPageComponent } from './features/super-admin/analytics/analytics.page';
 import { BusinessesPageComponent } from './features/super-admin/businesses/businesses.page';
+import { UsersPageComponent } from './features/super-admin/users/users.page';
 
 export const routes: Routes = [
 	{
@@ -126,14 +128,29 @@ export const routes: Routes = [
 		]
 	},
 	{
-		path: 'admin/analytics',
-		canActivate: [sessionGuard, superAdminGuard],
-		component: AnalyticsPageComponent
-	},
-	{
 		path: 'admin',
 		canActivate: [sessionGuard, superAdminGuard],
-		component: BusinessesPageComponent
+		component: AdminShellPageComponent,
+		children: [
+			{
+				// Pantalla principal del super admin: la analitica de la plataforma.
+				path: '',
+				pathMatch: 'full',
+				component: AnalyticsPageComponent
+			},
+			{
+				path: 'negocios',
+				component: BusinessesPageComponent
+			},
+			{
+				path: 'usuarios',
+				component: UsersPageComponent
+			},
+			{
+				path: '**',
+				redirectTo: ''
+			}
+		]
 	},
 	{
 		path: 'employee',

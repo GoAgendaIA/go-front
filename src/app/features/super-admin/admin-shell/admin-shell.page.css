@@ -1,0 +1,144 @@
+:host {
+  display: block;
+  height: 100dvh;
+}
+
+.shell-layout {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--go-bg);
+  overflow: hidden;
+}
+
+.topbar {
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.1rem 1.15rem;
+  background: var(--go-navy);
+}
+
+.brand-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem 0.75rem;
+}
+
+.brand-logo {
+  display: block;
+  height: 1.5rem;
+  width: auto;
+}
+
+.role-tag {
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  background: color-mix(in srgb, var(--go-teal) 28%, transparent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.topbar-spacer {
+  flex: 1;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  opacity: 0.85;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.logout-btn:disabled {
+  opacity: 0.5;
+}
+
+.content-panel {
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bottom-nav {
+  z-index: 25;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  border-top: 1px solid color-mix(in srgb, var(--go-slate-200) 85%, white);
+  background: #ffffff;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav a {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  min-height: 3.6rem;
+  padding-top: 0.55rem;
+  color: color-mix(in srgb, var(--go-dark) 60%, white);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.bottom-nav a.active {
+  color: var(--go-teal);
+}
+
+@media (max-width: 520px) {
+  .role-tag {
+    display: none;
+  }
+
+  .logout-btn span {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .shell-layout {
+    grid-template-columns: 14rem 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .topbar {
+    grid-column: 1 / -1;
+  }
+
+  .bottom-nav {
+    position: static;
+    grid-row: 2;
+    grid-template-columns: 1fr;
+    align-content: start;
+    border-top: 0;
+    border-right: 1px solid color-mix(in srgb, var(--go-slate-200) 85%, white);
+    padding-top: 0.8rem;
+    background: transparent;
+  }
+
+  .bottom-nav a {
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: start;
+    justify-items: start;
+    gap: 0.6rem;
+    padding-left: 1.1rem;
+    min-height: 2.9rem;
+    border-radius: 0.8rem;
+    margin: 0.2rem 0.45rem;
+  }
+
+  .bottom-nav a.active {
+    background: color-mix(in srgb, var(--go-teal) 10%, white);
+  }
+}

@@ -364,6 +364,34 @@ export interface AdminBusinessesListResponse {
   businesses: AdminBusiness[];
 }
 
+/** Cuenta de administracion de GoAgenda (super admin). email es null si la cuenta de Auth ya no existe. */
+export interface SuperAdminUser {
+  user_id: string;
+  email: string | null;
+  created_at: string | null;
+  is_me: boolean;
+  /** Cuenta definida en la configuracion del servidor: no se puede revocar desde la app. */
+  is_primary: boolean;
+}
+
+export interface SuperAdminRevokeResponse {
+  revoked: boolean;
+  user_id: string;
+}
+
+export interface SuperAdminCreate {
+  email: string;
+  password: string;
+}
+
+export interface SuperAdminsListResponse {
+  super_admins: SuperAdminUser[];
+}
+
+export interface SuperAdminCreateResponse {
+  super_admin: SuperAdminUser;
+}
+
 export interface AdminBusinessCreate {
   name: string;
   business_type?: string | null;

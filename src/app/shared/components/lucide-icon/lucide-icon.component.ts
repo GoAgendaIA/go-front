@@ -40,7 +40,7 @@ export type LucideIconName =
   | 'map-pin'
   | 'credit-card'
   | 'chart-column'
-  | 'arrow-left'
+  | 'users'
   | 'x';
 
 type IconElement =
@@ -319,11 +319,19 @@ const LUCIDE_ICONS: Record<LucideIconName, LucideIconData> = {
     elements: [rect(2, 5, 20, 14, 2, 2), path('M2 10h20')]
   },
   x: { viewBox: '0 0 24 24', elements: [path('M18 6 6 18'), path('m6 6 12 12')] },
+  users: {
+    viewBox: '0 0 24 24',
+    elements: [
+      path('M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'),
+      circle(9, 7, 4),
+      path('M22 21v-2a4 4 0 0 0-3-3.87'),
+      path('M16 3.13a4 4 0 0 1 0 7.75')
+    ]
+  },
   'chart-column': {
     viewBox: '0 0 24 24',
     elements: [path('M3 3v16a2 2 0 0 0 2 2h16'), path('M18 17V9'), path('M13 17V5'), path('M8 17v-3')]
-  },
-  'arrow-left': { viewBox: '0 0 24 24', elements: [path('m12 19-7-7 7-7'), path('M19 12H5')] }
+  }
 };
 
 @Component({

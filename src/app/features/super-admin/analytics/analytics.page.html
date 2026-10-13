@@ -1,21 +1,7 @@
 <section class="page">
-  <header class="topbar">
-    <div class="brand-wrap">
-      <img src="/Logo.png" alt="GoAgenda" class="brand-logo" />
-    </div>
-    <button type="button" class="logout-btn" (click)="logout()" [disabled]="isLoggingOut()">
-      <app-lucide-icon name="log-out" [size]="18" [strokeWidth]="2" />
-      {{ isLoggingOut() ? 'Cerrando sesion...' : 'Cerrar sesion' }}
-    </button>
-  </header>
-
   <div class="page-body">
     <header class="page-header">
       <div>
-        <button type="button" class="back-link" (click)="goBack()">
-          <app-lucide-icon name="arrow-left" [size]="16" [strokeWidth]="2" />
-          Negocios
-        </button>
         <h1>Analitica</h1>
         <p>
           @if (isGlobal()) {

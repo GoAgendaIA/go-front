@@ -1,10 +1,8 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { AdminBusiness } from '../../../core/models/goagenda.models';
 import { GoagendaApiService } from '../../../core/services/goagenda-api.service';
-import { SupabaseAuthService } from '../../../core/services/supabase-auth.service';
 import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
 import { UiButtonComponent } from '../../../shared/components/ui-button/ui-button.component';
 import { UiModalComponent } from '../../../shared/components/ui-modal/ui-modal.component';
@@ -18,12 +16,9 @@ import { UiTextFieldComponent } from '../../../shared/components/ui-text-field/u
 })
 export class BusinessesPageComponent implements OnInit {
   private readonly apiService = inject(GoagendaApiService);
-  private readonly authService = inject(SupabaseAuthService);
-  private readonly router = inject(Router);
 
   readonly businesses = signal<AdminBusiness[]>([]);
   readonly isLoading = signal(false);
-  readonly isLoggingOut = signal(false);
   readonly error = signal('');
 
   readonly isCreateModalOpen = signal(false);
@@ -60,10 +55,6 @@ export class BusinessesPageComponent implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  openAnalytics(): void {
-    void this.router.navigateByUrl('/admin/analytics');
   }
 
   openCreateModal(): void {
@@ -150,17 +141,6 @@ export class BusinessesPageComponent implements OnInit {
       this.error.set('No se pudo actualizar el bloqueo del negocio.');
     } finally {
       this.isTogglingBlock.set(false);
-    }
-  }
-
-  async logout(): Promise<void> {
-    this.isLoggingOut.set(true);
-
-    try {
-      await this.authService.signOut();
-      await this.router.navigateByUrl('/auth/login', { replaceUrl: true });
-    } finally {
-      this.isLoggingOut.set(false);
     }
   }
 }

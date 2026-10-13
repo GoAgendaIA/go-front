@@ -1,30 +1,14 @@
 <section class="page">
-  <header class="topbar">
-    <div class="brand-wrap">
-      <img src="/Logo.png" alt="GoAgenda" class="brand-logo" />
-    </div>
-    <button type="button" class="logout-btn" (click)="logout()" [disabled]="isLoggingOut()">
-      <app-lucide-icon name="log-out" [size]="18" [strokeWidth]="2" />
-      {{ isLoggingOut() ? 'Cerrando sesion...' : 'Cerrar sesion' }}
-    </button>
-  </header>
-
   <div class="page-body">
     <header class="page-header">
       <div>
         <h1>Negocios</h1>
         <p>Crea negocios y administra sus codigos de invitacion</p>
       </div>
-      <div class="header-actions">
-        <app-button type="button" variant="ghost" [fit]="true" (click)="openAnalytics()">
-          <app-lucide-icon name="chart-column" [size]="20" [strokeWidth]="2" />
-          Analitica
-        </app-button>
-        <app-button type="button" [fit]="true" (click)="openCreateModal()">
-          <app-lucide-icon name="plus" [size]="20" [strokeWidth]="2.2" />
-          Nuevo negocio
-        </app-button>
-      </div>
+      <app-button type="button" [fit]="true" (click)="openCreateModal()">
+        <app-lucide-icon name="plus" [size]="20" [strokeWidth]="2.2" />
+        Nuevo negocio
+      </app-button>
     </header>
 
     @if (error()) {

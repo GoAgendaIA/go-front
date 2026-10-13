@@ -1,0 +1,133 @@
+<section class="page-body">
+  <header class="page-header">
+    <div>
+      <h1>Usuarios</h1>
+      <p>Cuentas de administracion de GoAgenda (super admin)</p>
+    </div>
+    <app-button type="button" [fit]="true" (click)="openModal()">
+      <app-lucide-icon name="plus" [size]="20" [strokeWidth]="2.2" />
+      Nuevo super admin
+    </app-button>
+  </header>
+
+  <p class="note">
+    Un super admin puede ver la analitica de toda la plataforma, crear y bloquear negocios y crear otras cuentas de
+    administracion. Dalo solo a personas de confianza.
+  </p>
+
+  @if (success()) {
+    <p class="success-banner" role="status">{{ success() }}</p>
+  }
+  @if (error()) {
+    <p class="error-banner" role="alert">{{ error() }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="hint-text">Cargando cuentas...</p>
+  } @else {
+    <div class="user-list">
+      @for (admin of admins(); track admin.user_id) {
+        <article class="user-card">
+          <div class="avatar" aria-hidden="true">
+            <app-lucide-icon name="user" [size]="20" [strokeWidth]="2" />
+          </div>
+          <div class="user-info">
+            <h3>{{ admin.email ?? 'Cuenta sin correo' }}</h3>
+            <p>
+              @if (admin.created_at) {
+                Desde {{ admin.created_at | date: 'dd/MM/yyyy' }}
+              } @else {
+                Cuenta creada antes del registro de fechas
+              }
+            </p>
+          </div>
+          @if (admin.is_me) {
+            <span class="badge">Tu cuenta</span>
+          } @else if (admin.is_primary) {
+            <span class="badge badge-neutral" title="Definida en la configuracion del servidor">Cuenta principal</span>
+          } @else {
+            <app-button type="button" variant="ghost" [fit]="true" (click)="askRevoke(admin)">
+              <app-lucide-icon name="x" [size]="16" [strokeWidth]="2" />
+              Revocar acceso
+            </app-button>
+          }
+        </article>
+      } @empty {
+        <p class="hint-text">No hay cuentas de administracion.</p>
+      }
+    </div>
+  }
+</section>
+
+@if (isModalOpen()) {
+  <app-modal title="Nuevo super admin" (close)="closeModal()">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="modal-form">
+      <app-text-field
+        label="Correo"
+        icon="mail"
+        type="email"
+        inputmode="email"
+        autocomplete="off"
+        placeholder="Correo"
+        formControlName="email"
+        [error]="fieldError('email')"
+      />
+      <app-text-field
+        label="Contrasena"
+        icon="lock"
+        type="password"
+        autocomplete="new-password"
+        placeholder="Contrasena (minimo 8 caracteres)"
+        formControlName="password"
+        [error]="fieldError('password')"
+      />
+      <app-text-field
+        label="Confirmar contrasena"
+        icon="lock"
+        type="password"
+        autocomplete="new-password"
+        placeholder="Confirmar contrasena"
+        formControlName="confirm_password"
+        [error]="fieldError('confirm_password')"
+      />
+
+      @if (formError()) {
+        <p class="error-banner" role="alert">{{ formError() }}</p>
+      }
+
+      <p class="note">
+        La cuenta se crea con el correo ya verificado: podra iniciar sesion de inmediato. Comparte la contrasena por un
+        canal seguro.
+      </p>
+
+      <app-button type="submit" [loading]="isSaving()">
+        {{ isSaving() ? 'Creando...' : 'Crear cuenta' }}
+      </app-button>
+    </form>
+  </app-modal>
+}
+
+@if (revokeTarget(); as target) {
+  <app-modal title="Revocar acceso" (close)="cancelRevoke()">
+    <div class="confirm-body">
+      <p>
+        ¿Quitar el acceso de administracion a <strong>{{ target.email ?? 'esta cuenta' }}</strong>? Dejara de poder ver
+        la analitica, crear negocios y administrar cuentas de inmediato.
+      </p>
+      <p class="note">
+        La cuenta no se elimina: si tambien es dueño o empleado de un negocio, seguira funcionando ahi.
+      </p>
+
+      @if (revokeError()) {
+        <p class="error-banner" role="alert">{{ revokeError() }}</p>
+      }
+
+      <div class="confirm-actions">
+        <app-button type="button" variant="ghost" (click)="cancelRevoke()">Cancelar</app-button>
+        <app-button type="button" [loading]="isRevoking()" (click)="confirmRevoke()">
+          {{ isRevoking() ? 'Revocando...' : 'Revocar acceso' }}
+        </app-button>
+      </div>
+    </div>
+  </app-modal>
+}

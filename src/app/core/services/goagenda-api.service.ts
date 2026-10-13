@@ -58,6 +58,11 @@ import {
   InvitationCodeResponse,
   MetricsParams,
   MetricsResponse,
+  SuperAdminCreate,
+  SuperAdminCreateResponse,
+  SuperAdminRevokeResponse,
+  SuperAdminsListResponse,
+  SuperAdminUser,
   ManualAppointmentInput,
   MeResponse,
   OnboardingCompleteInput,
@@ -118,6 +123,23 @@ export class GoagendaApiService {
     return this.http
       .post<InvitationCodeResponse>(`${GOAGENDA_API_URL}/admin/businesses/${businessId}/invitation-codes`, {})
       .pipe(map((response) => response.invitation_code));
+  }
+
+  // Cuentas de administracion (super admins)
+  adminListSuperAdmins(): Observable<SuperAdminUser[]> {
+    return this.http
+      .get<SuperAdminsListResponse>(`${GOAGENDA_API_URL}/admin/super-admins`)
+      .pipe(map((response) => response.super_admins));
+  }
+
+  adminCreateSuperAdmin(payload: SuperAdminCreate): Observable<SuperAdminUser> {
+    return this.http
+      .post<SuperAdminCreateResponse>(`${GOAGENDA_API_URL}/admin/super-admins`, payload)
+      .pipe(map((response) => response.super_admin));
+  }
+
+  adminRevokeSuperAdmin(userId: string): Observable<SuperAdminRevokeResponse> {
+    return this.http.delete<SuperAdminRevokeResponse>(`${GOAGENDA_API_URL}/admin/super-admins/${userId}`);
   }
 
   // Metricas y analitica (super admin)
