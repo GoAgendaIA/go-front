@@ -484,3 +484,138 @@ export interface WompiPaymentRequestCheckResponse {
   solicitud: WompiPaymentRequest;
   mensaje: string;
 }
+
+
+// ---------------------------------------------------------------------
+// Centro de metricas y analitica (solo super admin) - ver backend:
+// docs/METRICAS_ANALITICA.md. Los porcentajes y tasas llegan en null
+// cuando no son calculables (denominador 0): se muestran como "—".
+// ---------------------------------------------------------------------
+
+export type MetricsGroupBy = 'day' | 'week' | 'month';
+export type MetricsOrigin = 'ai' | 'manual' | 'web' | 'unknown';
+export type MetricsBusinessState = 'activo' | 'inactivo' | 'sin_uso';
+
+export interface MetricsParams {
+  desde?: string;
+  hasta?: string;
+  group_by?: MetricsGroupBy;
+  comparar?: boolean;
+  inactividad_dias?: number;
+  refrescar?: boolean;
+}
+
+export interface MetricsAlert {
+  tipo: string;
+  severidad: 'alta' | 'media' | 'baja';
+  mensaje: string;
+  recomendacion: string;
+  business_id?: string;
+  nombre?: string;
+}
+
+export interface MetricsEvolutionPoint {
+  periodo: string;
+  total: number;
+  ia: number;
+  manual: number;
+}
+
+export interface MetricsComparisonItem {
+  actual: number | null;
+  anterior: number | null;
+  variacion: number | null;
+  variacion_pct: number | null;
+}
+
+export interface MetricsBusinessRow {
+  business_id: string;
+  nombre: string | null;
+  registrado_en: string | null;
+  bloqueado: boolean;
+  onboarding_completado: boolean;
+  estado: MetricsBusinessState;
+  ultima_actividad: string | null;
+  configuracion: { servicios_activos: number; tiene_horario: boolean };
+  usa_ia: boolean;
+  citas_en_periodo: number;
+  citas_ia_en_periodo: number;
+  citas_manuales_en_periodo: number;
+  porcentaje_citas_ia: number | null;
+  tasa_cancelacion: number | null;
+  conversion: number | null;
+  costo_ia_usd: number;
+  dias_hasta_primera_cita: number | null;
+  citas_por_semana: number[];
+  alertas: MetricsAlert[];
+}
+
+export interface MetricsAdoption {
+  negocios_registrados: number;
+  negocios_activos: number;
+  negocios_inactivos: number;
+  negocios_sin_uso: number;
+  porcentaje_activos: number | null;
+  con_servicios: number;
+  con_horario: number;
+  usan_ia: number;
+  solo_agendamiento_manual: number;
+  dias_hasta_primera_cita: { mediana: number | null; negocios_medidos: number };
+  dejaron_de_usar: number;
+  inactividad_dias: number;
+}
+
+export interface MetricsResponse {
+  periodo: { desde: string; hasta: string; anterior: { desde: string; hasta: string } | null; agrupado_por: MetricsGroupBy };
+  criterios: Record<string, string>;
+  generado_en: string;
+  actualizacion_segundos: number;
+  cache: boolean;
+  tarjetas: { citas_creadas: number; clientes_unicos: number; citas_ia: number; citas_manuales: number };
+  clientes: {
+    total_registrados: number;
+    nuevos_en_periodo: number;
+    recurrentes: number;
+    sin_volver: { dias: number; total: number };
+  };
+  citas: {
+    total: number;
+    por_estado: Record<'pending' | 'pending_payment' | 'confirmed' | 'completed' | 'cancelled', number>;
+    reprogramadas: number;
+    tasa_cancelacion: number | null;
+    porcentaje_completadas: number | null;
+    pagos_vencidos: number;
+    evolucion: MetricsEvolutionPoint[];
+  };
+  ia: {
+    por_origen: Record<MetricsOrigin, { total: number; porcentaje: number | null }>;
+    porcentaje_citas_ia: number | null;
+    canceladas_por_ia: number;
+    reprogramadas_por_ia: number;
+    conversaciones: {
+      iniciadas: number;
+      con_cita: number;
+      transferidas_a_humano: number;
+      conversion: number | null;
+    };
+    costo_usd: number;
+    costo_por_cita_ia_usd: number | null;
+  };
+  rendimiento: {
+    servicios_mas_agendados: { service_id: string; nombre: string; total: number; porcentaje: number | null }[];
+    citas_por_dia_semana: { dia: string; total: number }[];
+    citas_por_hora: { hora: number; total: number }[];
+    domicilios: { total: number; porcentaje: number | null };
+    ingresos_estimados: { completadas: number; por_realizar: number; recargos_domicilio: number };
+  };
+  comparacion?: Record<
+    'citas_creadas' | 'clientes_unicos' | 'citas_ia' | 'citas_manuales' | 'tasa_cancelacion' | 'conversion' | 'costo_ia_usd',
+    MetricsComparisonItem
+  >;
+  /** Solo en el panel global. */
+  adopcion?: MetricsAdoption;
+  negocios?: MetricsBusinessRow[];
+  alertas?: MetricsAlert[];
+  /** Solo en el panel individual. */
+  negocio?: MetricsBusinessRow;
+}

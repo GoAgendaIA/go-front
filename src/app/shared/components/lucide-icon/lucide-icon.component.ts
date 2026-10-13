@@ -39,6 +39,8 @@ export type LucideIconName =
   | 'search'
   | 'map-pin'
   | 'credit-card'
+  | 'chart-column'
+  | 'arrow-left'
   | 'x';
 
 type IconElement =
@@ -316,7 +318,12 @@ const LUCIDE_ICONS: Record<LucideIconName, LucideIconData> = {
     viewBox: '0 0 24 24',
     elements: [rect(2, 5, 20, 14, 2, 2), path('M2 10h20')]
   },
-  x: { viewBox: '0 0 24 24', elements: [path('M18 6 6 18'), path('m6 6 12 12')] }
+  x: { viewBox: '0 0 24 24', elements: [path('M18 6 6 18'), path('m6 6 12 12')] },
+  'chart-column': {
+    viewBox: '0 0 24 24',
+    elements: [path('M3 3v16a2 2 0 0 0 2 2h16'), path('M18 17V9'), path('M13 17V5'), path('M8 17v-3')]
+  },
+  'arrow-left': { viewBox: '0 0 24 24', elements: [path('m12 19-7-7 7-7'), path('M19 12H5')] }
 };
 
 @Component({

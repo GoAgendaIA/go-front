@@ -15,10 +15,16 @@
         <h1>Negocios</h1>
         <p>Crea negocios y administra sus codigos de invitacion</p>
       </div>
-      <app-button type="button" [fit]="true" (click)="openCreateModal()">
-        <app-lucide-icon name="plus" [size]="20" [strokeWidth]="2.2" />
-        Nuevo negocio
-      </app-button>
+      <div class="header-actions">
+        <app-button type="button" variant="ghost" [fit]="true" (click)="openAnalytics()">
+          <app-lucide-icon name="chart-column" [size]="20" [strokeWidth]="2" />
+          Analitica
+        </app-button>
+        <app-button type="button" [fit]="true" (click)="openCreateModal()">
+          <app-lucide-icon name="plus" [size]="20" [strokeWidth]="2.2" />
+          Nuevo negocio
+        </app-button>
+      </div>
     </header>
 
     @if (error()) {

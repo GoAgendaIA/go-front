@@ -30,6 +30,7 @@ import { MyHoursPageComponent } from './features/employee/hours/my-hours.page';
 import { MyServicesPageComponent } from './features/employee/services/my-services.page';
 import { MyProfilePageComponent } from './features/employee/profile/my-profile.page';
 import { RedeemCodePageComponent } from './features/onboarding/redeem-code/redeem-code.page';
+import { AnalyticsPageComponent } from './features/super-admin/analytics/analytics.page';
 import { BusinessesPageComponent } from './features/super-admin/businesses/businesses.page';
 
 export const routes: Routes = [
@@ -123,6 +124,11 @@ export const routes: Routes = [
 				component: ChatSessionPageComponent
 			}
 		]
+	},
+	{
+		path: 'admin/analytics',
+		canActivate: [sessionGuard, superAdminGuard],
+		component: AnalyticsPageComponent
 	},
 	{
 		path: 'admin',

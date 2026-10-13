@@ -56,6 +56,8 @@ import {
   WompiValidateResponse,
   InvitationCode,
   InvitationCodeResponse,
+  MetricsParams,
+  MetricsResponse,
   ManualAppointmentInput,
   MeResponse,
   OnboardingCompleteInput,
@@ -116,6 +118,31 @@ export class GoagendaApiService {
     return this.http
       .post<InvitationCodeResponse>(`${GOAGENDA_API_URL}/admin/businesses/${businessId}/invitation-codes`, {})
       .pipe(map((response) => response.invitation_code));
+  }
+
+  // Metricas y analitica (super admin)
+  adminGetGlobalMetrics(params: MetricsParams): Observable<MetricsResponse> {
+    return this.http.get<MetricsResponse>(`${GOAGENDA_API_URL}/admin/metrics/global`, {
+      params: this.metricsHttpParams(params)
+    });
+  }
+
+  adminGetBusinessMetrics(businessId: string, params: MetricsParams): Observable<MetricsResponse> {
+    return this.http.get<MetricsResponse>(`${GOAGENDA_API_URL}/admin/metrics/businesses/${businessId}`, {
+      params: this.metricsHttpParams(params)
+    });
+  }
+
+  private metricsHttpParams(params: MetricsParams): HttpParams {
+    let httpParams = new HttpParams();
+
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== null && value !== '') {
+        httpParams = httpParams.set(key, String(value));
+      }
+    }
+
+    return httpParams;
   }
 
   // Empleados

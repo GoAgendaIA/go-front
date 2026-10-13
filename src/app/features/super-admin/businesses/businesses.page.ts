@@ -62,6 +62,10 @@ export class BusinessesPageComponent implements OnInit {
     }
   }
 
+  openAnalytics(): void {
+    void this.router.navigateByUrl('/admin/analytics');
+  }
+
   openCreateModal(): void {
     this.createForm.reset({ name: '', business_type: '' });
     this.isCreateModalOpen.set(true);

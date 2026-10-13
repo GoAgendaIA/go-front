@@ -1,0 +1,402 @@
+<section class="page">
+  <header class="topbar">
+    <div class="brand-wrap">
+      <img src="/Logo.png" alt="GoAgenda" class="brand-logo" />
+    </div>
+    <button type="button" class="logout-btn" (click)="logout()" [disabled]="isLoggingOut()">
+      <app-lucide-icon name="log-out" [size]="18" [strokeWidth]="2" />
+      {{ isLoggingOut() ? 'Cerrando sesion...' : 'Cerrar sesion' }}
+    </button>
+  </header>
+
+  <div class="page-body">
+    <header class="page-header">
+      <div>
+        <button type="button" class="back-link" (click)="goBack()">
+          <app-lucide-icon name="arrow-left" [size]="16" [strokeWidth]="2" />
+          Negocios
+        </button>
+        <h1>Analitica</h1>
+        <p>
+          @if (isGlobal()) {
+            Uso consolidado de GoAgenda en todos los negocios
+          } @else {
+            Metricas de <strong>{{ selectedBusinessName() }}</strong>
+          }
+        </p>
+      </div>
+      <button type="button" class="icon-btn" (click)="load(true)" [disabled]="isLoading()" aria-label="Actualizar">
+        <app-lucide-icon name="refresh-cw" [size]="18" [strokeWidth]="2" />
+        Actualizar
+      </button>
+    </header>
+
+    <!-- Filtros -->
+    <div class="filters">
+      <label class="field">
+        <span>Vista</span>
+        <select [ngModel]="businessId()" (ngModelChange)="selectBusiness($event)">
+          <option value="">Toda la plataforma</option>
+          @for (business of businesses(); track business.id) {
+            <option [value]="business.id">{{ business.name }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="field">
+        <span>Periodo</span>
+        <div class="segmented" role="group" aria-label="Periodo">
+          @for (option of [['7', '7 dias'], ['30', '30 dias'], ['90', '90 dias'], ['custom', 'Personalizado']]; track option[0]) {
+            <button type="button" [class.active]="preset() === option[0]" (click)="setPreset($any(option[0]))">
+              {{ option[1] }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <label class="field">
+        <span>Desde</span>
+        <input type="date" [ngModel]="desde()" (ngModelChange)="desde.set($event); onDateChange()" [max]="hasta()" />
+      </label>
+      <label class="field">
+        <span>Hasta</span>
+        <input type="date" [ngModel]="hasta()" (ngModelChange)="hasta.set($event); onDateChange()" [min]="desde()" />
+      </label>
+
+      <div class="field">
+        <span>Agrupar por</span>
+        <div class="segmented" role="group" aria-label="Agrupar por">
+          @for (option of [['day', 'Dia'], ['week', 'Semana'], ['month', 'Mes']]; track option[0]) {
+            <button type="button" [class.active]="groupBy() === option[0]" (click)="setGroupBy($any(option[0]))">
+              {{ option[1] }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" [checked]="comparar()" (change)="toggleCompare()" />
+        Comparar con el periodo anterior
+      </label>
+    </div>
+
+    @if (error()) {
+      <p class="error-banner" role="alert">{{ error() }}</p>
+    }
+
+    @if (isLoading() && !data()) {
+      <p class="hint-text">Cargando metricas...</p>
+    }
+
+    @if (data(); as d) {
+      <div class="content" [class.refreshing]="isLoading()">
+        <p class="meta">
+          Del {{ d.periodo.desde }} al {{ d.periodo.hasta }}
+          @if (d.periodo.anterior; as prev) {
+            · comparado con {{ prev.desde }} – {{ prev.hasta }}
+          }
+          · actualizado {{ d.generado_en | date: 'shortTime' }}
+        </p>
+
+        <!-- Tarjetas principales -->
+        <div class="kpi-grid">
+          <article class="kpi">
+            <span class="kpi-label">Citas creadas</span>
+            <strong class="kpi-value">{{ d.tarjetas.citas_creadas }}</strong>
+            @if (delta(d.comparacion?.citas_creadas); as c) {
+              <span class="delta" [class]="'delta ' + c.tone">{{ c.text }}</span>
+            }
+          </article>
+          <article class="kpi">
+            <span class="kpi-label">Clientes unicos</span>
+            <strong class="kpi-value">{{ d.tarjetas.clientes_unicos }}</strong>
+            @if (delta(d.comparacion?.clientes_unicos); as c) {
+              <span class="delta" [class]="'delta ' + c.tone">{{ c.text }}</span>
+            }
+          </article>
+          <article class="kpi accent">
+            <span class="kpi-label">Citas por IA</span>
+            <strong class="kpi-value">{{ d.tarjetas.citas_ia }}</strong>
+            <span class="kpi-sub">{{ percent(d.ia.porcentaje_citas_ia) }} del total</span>
+            @if (delta(d.comparacion?.citas_ia); as c) {
+              <span class="delta" [class]="'delta ' + c.tone">{{ c.text }}</span>
+            }
+          </article>
+          <article class="kpi">
+            <span class="kpi-label">Citas manuales</span>
+            <strong class="kpi-value">{{ d.tarjetas.citas_manuales }}</strong>
+            <span class="kpi-sub">{{ percent(d.ia.por_origen.manual.porcentaje) }} del total</span>
+            @if (delta(d.comparacion?.citas_manuales); as c) {
+              <span class="delta" [class]="'delta ' + c.tone">{{ c.text }}</span>
+            }
+          </article>
+        </div>
+
+        @if (d.ia.por_origen.unknown.total > 0) {
+          <p class="note">
+            {{ d.ia.por_origen.unknown.total }} cita(s) del periodo no tienen origen registrado (son anteriores a la
+            instrumentacion de metricas) y no se asignan ni a IA ni a manual.
+          </p>
+        }
+
+        <!-- Evolucion + origen -->
+        <div class="grid two">
+          <section class="card">
+            <h2>Evolucion de citas creadas</h2>
+            <app-bar-chart
+              [labels]="evolutionLabels()"
+              [series]="evolutionSeries()"
+              ariaLabel="Citas creadas por periodo, separadas por origen"
+            />
+          </section>
+          <section class="card">
+            <h2>Origen de las citas</h2>
+            <app-donut-chart [slices]="originSlices()" centerLabel="citas" ariaLabel="Distribucion de citas por origen" />
+          </section>
+        </div>
+
+        <!-- Estados + IA -->
+        <div class="grid two">
+          <section class="card">
+            <h2>Estado de las citas</h2>
+            <ul class="hbars">
+              @for (row of stateRows(); track row.key) {
+                <li>
+                  <div class="hbar-head">
+                    <span>{{ row.label }}</span>
+                    <strong>{{ row.count }} <small>({{ row.percent }}%)</small></strong>
+                  </div>
+                  <div class="hbar-track"><div class="hbar-fill" [style.width.%]="row.percent" [style.background]="row.color"></div></div>
+                </li>
+              }
+            </ul>
+            <dl class="facts">
+              <div>
+                <dt>Tasa de cancelacion</dt>
+                <dd>
+                  {{ percent(d.citas.tasa_cancelacion) }}
+                  @if (delta(d.comparacion?.tasa_cancelacion, true); as c) {
+                    <span [class]="'delta ' + c.tone">{{ c.text }}</span>
+                  }
+                </dd>
+              </div>
+              <div><dt>Completadas</dt><dd>{{ percent(d.citas.porcentaje_completadas) }}</dd></div>
+              <div><dt>Reprogramadas</dt><dd>{{ d.citas.reprogramadas }}</dd></div>
+              <div><dt>Pagos vencidos (no cuentan)</dt><dd>{{ d.citas.pagos_vencidos }}</dd></div>
+            </dl>
+          </section>
+
+          <section class="card">
+            <h2>Asistente de IA</h2>
+            <ul class="hbars">
+              @for (row of conversionBars(); track row.label) {
+                <li>
+                  <div class="hbar-head">
+                    <span>{{ row.label }}</span>
+                    <strong>{{ row.value }}</strong>
+                  </div>
+                  <div class="hbar-track"><div class="hbar-fill" [style.width.%]="row.width" [style.background]="row.color"></div></div>
+                </li>
+              }
+            </ul>
+            <dl class="facts">
+              <div>
+                <dt>Conversion a cita</dt>
+                <dd>
+                  {{ percent(d.ia.conversaciones.conversion) }}
+                  @if (delta(d.comparacion?.conversion); as c) {
+                    <span [class]="'delta ' + c.tone">{{ c.text }}</span>
+                  }
+                </dd>
+              </div>
+              <div><dt>Canceladas por la IA</dt><dd>{{ d.ia.canceladas_por_ia }}</dd></div>
+              <div><dt>Reprogramadas por la IA</dt><dd>{{ d.ia.reprogramadas_por_ia }}</dd></div>
+              <div><dt>Costo de IA</dt><dd>{{ usd(d.ia.costo_usd) }}</dd></div>
+              <div><dt>Costo por cita de IA</dt><dd>{{ usd(d.ia.costo_por_cita_ia_usd) }}</dd></div>
+            </dl>
+          </section>
+        </div>
+
+        <!-- Clientes -->
+        <section class="card">
+          <h2>Clientes</h2>
+          <div class="stat-row">
+            <div><strong>{{ d.clientes.total_registrados }}</strong><span>Clientes registrados</span></div>
+            <div><strong>{{ d.clientes.nuevos_en_periodo }}</strong><span>Nuevos en el periodo</span></div>
+            <div><strong>{{ d.clientes.recurrentes }}</strong><span>Recurrentes (2+ citas)</span></div>
+            <div>
+              <strong>{{ d.clientes.sin_volver.total }}</strong>
+              <span>Sin volver hace {{ d.clientes.sin_volver.dias }}+ dias</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Rendimiento -->
+        <h2 class="section-title">Rendimiento del negocio <small>(por fecha programada de la cita)</small></h2>
+        <div class="grid two">
+          <section class="card">
+            <h2>Servicios mas agendados</h2>
+            @if (serviceRows().length === 0) {
+              <p class="empty">Sin citas programadas en este periodo.</p>
+            } @else {
+              <ul class="hbars">
+                @for (row of serviceRows(); track row.service_id) {
+                  <li>
+                    <div class="hbar-head">
+                      <span>{{ row.nombre }}</span>
+                      <strong>{{ row.total }} <small>({{ percent(row.porcentaje) }})</small></strong>
+                    </div>
+                    <div class="hbar-track"><div class="hbar-fill" [style.width.%]="row.width" style="background: var(--go-teal)"></div></div>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+
+          <section class="card">
+            <h2>Ingresos estimados</h2>
+            <dl class="facts big">
+              <div><dt>Citas completadas</dt><dd>{{ d.rendimiento.ingresos_estimados.completadas | copCurrency }}</dd></div>
+              <div><dt>Por realizar (confirmadas)</dt><dd>{{ d.rendimiento.ingresos_estimados.por_realizar | copCurrency }}</dd></div>
+              <div><dt>Recargos de domicilio</dt><dd>{{ d.rendimiento.ingresos_estimados.recargos_domicilio | copCurrency }}</dd></div>
+              <div>
+                <dt>Citas a domicilio</dt>
+                <dd>{{ d.rendimiento.domicilios.total }} <small>({{ percent(d.rendimiento.domicilios.porcentaje) }})</small></dd>
+              </div>
+            </dl>
+            <p class="note">Usa el precio actual de cada servicio, no el valor realmente cobrado.</p>
+          </section>
+        </div>
+
+        <div class="grid two">
+          <section class="card">
+            <h2>Demanda por dia de la semana</h2>
+            <app-bar-chart [labels]="weekdayLabels()" [series]="weekdaySeries()" ariaLabel="Citas por dia de la semana" />
+          </section>
+          <section class="card">
+            <h2>Demanda por hora</h2>
+            <app-bar-chart [labels]="hourLabels()" [series]="hourSeries()" ariaLabel="Citas por hora del dia" />
+          </section>
+        </div>
+
+        <!-- Alertas -->
+        @if (activeAlerts().length > 0) {
+          <section class="card">
+            <h2>Alertas y recomendaciones</h2>
+            <ul class="alerts">
+              @for (alert of activeAlerts(); track $index) {
+                <li [class]="'alert ' + alert.severidad">
+                  <div class="alert-head">
+                    <span class="tag">{{ alertLabel(alert.tipo) }}</span>
+                    @if (alert.nombre) {
+                      <strong>{{ alert.nombre }}</strong>
+                    }
+                    <span class="severity">{{ alert.severidad }}</span>
+                  </div>
+                  <p>{{ alert.mensaje }}</p>
+                  <p class="reco">Recomendacion: {{ alert.recomendacion }}</p>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <!-- Adopcion (solo global) -->
+        @if (d.adopcion; as a) {
+          <h2 class="section-title">Adopcion de GoAgenda</h2>
+          <div class="kpi-grid">
+            <article class="kpi">
+              <span class="kpi-label">Negocios registrados</span>
+              <strong class="kpi-value">{{ a.negocios_registrados }}</strong>
+            </article>
+            <article class="kpi accent">
+              <span class="kpi-label">Negocios activos</span>
+              <strong class="kpi-value">{{ a.negocios_activos }}</strong>
+              <span class="kpi-sub">{{ percent(a.porcentaje_activos) }} de los registrados</span>
+            </article>
+            <article class="kpi">
+              <span class="kpi-label">Dejaron de usarlo</span>
+              <strong class="kpi-value">{{ a.dejaron_de_usar }}</strong>
+              <span class="kpi-sub">sin actividad en {{ a.inactividad_dias }}+ dias</span>
+            </article>
+            <article class="kpi">
+              <span class="kpi-label">Sin ningun uso</span>
+              <strong class="kpi-value">{{ a.negocios_sin_uso }}</strong>
+            </article>
+          </div>
+          <section class="card">
+            <div class="stat-row">
+              <div><strong>{{ a.con_servicios }}</strong><span>Con servicios configurados</span></div>
+              <div><strong>{{ a.con_horario }}</strong><span>Con horario configurado</span></div>
+              <div><strong>{{ a.usan_ia }}</strong><span>Usan la IA</span></div>
+              <div><strong>{{ a.solo_agendamiento_manual }}</strong><span>Solo agendan manual</span></div>
+              <div>
+                <strong>{{ a.dias_hasta_primera_cita.mediana ?? '—' }}</strong>
+                <span>Dias hasta la 1ra cita (mediana, {{ a.dias_hasta_primera_cita.negocios_medidos }} negocios)</span>
+              </div>
+            </div>
+          </section>
+        }
+
+        <!-- Detalle por negocio (solo global) -->
+        @if (d.negocios) {
+          <section class="card">
+            <h2>Actividad por negocio</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Negocio</th>
+                    <th>Estado</th>
+                    <th class="num">Citas</th>
+                    <th class="num">% IA</th>
+                    <th class="num">Cancel.</th>
+                    <th class="num">Conversion</th>
+                    <th class="num">Costo IA</th>
+                    <th class="num">Esta semana</th>
+                    <th>Ultima actividad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of sortedBusinesses(); track row.business_id) {
+                    <tr (click)="openBusiness(row)" tabindex="0" (keydown.enter)="openBusiness(row)">
+                      <td>
+                        <strong>{{ row.nombre }}</strong>
+                        @if (row.bloqueado) {
+                          <span class="badge blocked">Bloqueado</span>
+                        }
+                        @if (row.alertas.length > 0) {
+                          <span class="badge warn">{{ row.alertas.length }} alerta(s)</span>
+                        }
+                      </td>
+                      <td><span class="badge" [class]="'badge state-' + row.estado">{{ stateBadge(row.estado) }}</span></td>
+                      <td class="num">{{ row.citas_en_periodo }}</td>
+                      <td class="num">{{ percent(row.porcentaje_citas_ia) }}</td>
+                      <td class="num">{{ percent(row.tasa_cancelacion) }}</td>
+                      <td class="num">{{ percent(row.conversion) }}</td>
+                      <td class="num">{{ usd(row.costo_ia_usd) }}</td>
+                      <td class="num">{{ weekTotal(row) }}</td>
+                      <td>{{ row.ultima_actividad ? (row.ultima_actividad | date: 'dd/MM/yy') : '—' }}</td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="9" class="empty">Todavia no hay negocios registrados.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <p class="note">Toca un negocio para ver su panel individual.</p>
+          </section>
+        }
+
+        <details class="criteria">
+          <summary>Como se calcula</summary>
+          <ul>
+            @for (item of d.criterios | keyvalue; track item.key) {
+              <li><strong>{{ item.key }}:</strong> {{ item.value }}</li>
+            }
+          </ul>
+        </details>
+      </div>
+    }
+  </div>
+</section>
