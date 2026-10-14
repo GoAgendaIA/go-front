@@ -1,0 +1,34 @@
+name: CI (pull requests)
+
+# Chequeos de cada PR: que compile y que pasen las pruebas. Es un workflow aparte
+# del de deploy: no publica imagenes ni despliega nada, y no usa secretos.
+on:
+  pull_request:
+
+# Un push nuevo al mismo PR cancela la corrida anterior.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-y-pruebas:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Misma version mayor que la imagen de produccion (node:22-alpine en el Dockerfile).
+          node-version: "22"
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar (produccion)
+        run: npx ng build
+
+      - name: Pruebas unitarias
+        run: npx ng test --watch=false
