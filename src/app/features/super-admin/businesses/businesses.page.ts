@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-import { AdminBusiness } from '../../../core/models/goagenda.models';
+import { AdminBusiness, AiBudgetRow } from '../../../core/models/goagenda.models';
 import { GoagendaApiService } from '../../../core/services/goagenda-api.service';
 import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
 import { UiButtonComponent } from '../../../shared/components/ui-button/ui-button.component';
@@ -26,6 +26,15 @@ export class BusinessesPageComponent implements OnInit {
 
   readonly generatedCode = signal('');
   readonly codeCopied = signal(false);
+
+  // Presupuesto mensual de IA (US$) y gasto del mes por negocio.
+  readonly budgets = signal<Record<string, AiBudgetRow>>({});
+  readonly defaultBudgetUsd = signal(5);
+  readonly hardCutoffActive = signal(false);
+  readonly budgetTarget = signal<AdminBusiness | null>(null);
+  readonly budgetInput = signal('');
+  readonly budgetError = signal('');
+  readonly isSavingBudget = signal(false);
 
   readonly blockTarget = signal<AdminBusiness | null>(null);
   readonly isTogglingBlock = signal(false);
@@ -54,6 +63,75 @@ export class BusinessesPageComponent implements OnInit {
       this.error.set('No se pudieron cargar los negocios.');
     } finally {
       this.isLoading.set(false);
+    }
+
+    await this.loadBudgets();
+  }
+
+  /** El presupuesto es informacion adicional: si falla, la lista de negocios sigue funcionando. */
+  private async loadBudgets(): Promise<void> {
+    try {
+      const response = await firstValueFrom(this.apiService.adminListAiBudgets());
+      this.budgets.set(Object.fromEntries(response.presupuestos.map((row) => [row.business_id, row])));
+      this.defaultBudgetUsd.set(response.presupuesto_por_defecto_usd);
+      this.hardCutoffActive.set(response.corte_duro_activo);
+    } catch {
+      this.budgets.set({});
+    }
+  }
+
+  budgetOf(business: AdminBusiness): AiBudgetRow | null {
+    return this.budgets()[business.id] ?? null;
+  }
+
+  budgetBarWidth(row: AiBudgetRow): number {
+    return Math.min(100, row.porcentaje_usado ?? 0);
+  }
+
+  budgetState(row: AiBudgetRow): 'ok' | 'warn' | 'over' {
+    const percent = row.porcentaje_usado ?? 0;
+    return percent >= 100 ? 'over' : percent >= 80 ? 'warn' : 'ok';
+  }
+
+  openBudgetModal(business: AdminBusiness): void {
+    const row = this.budgetOf(business);
+    this.budgetInput.set(String(row?.presupuesto_efectivo_usd ?? this.defaultBudgetUsd()));
+    this.budgetError.set('');
+    this.budgetTarget.set(business);
+  }
+
+  closeBudgetModal(): void {
+    if (!this.isSavingBudget()) {
+      this.budgetTarget.set(null);
+    }
+  }
+
+  async saveBudget(): Promise<void> {
+    const business = this.budgetTarget();
+
+    if (!business || this.isSavingBudget()) {
+      return;
+    }
+
+    const value = Number(this.budgetInput().replace(',', '.'));
+
+    if (!Number.isFinite(value) || value <= 0 || value > 1000) {
+      this.budgetError.set('Escribe un monto entre 0.01 y 1000 USD.');
+      return;
+    }
+
+    this.budgetError.set('');
+    this.isSavingBudget.set(true);
+
+    try {
+      await firstValueFrom(this.apiService.adminSetAiBudget(business.id, value));
+      await this.loadBudgets();
+      this.budgetTarget.set(null);
+    } catch (error: unknown) {
+      const detail = (error as { error?: { detail?: unknown } })?.error?.detail;
+      this.budgetError.set(typeof detail === 'string' ? detail : 'No se pudo guardar el presupuesto.');
+    } finally {
+      this.isSavingBudget.set(false);
     }
   }
 

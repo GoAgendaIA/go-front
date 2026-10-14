@@ -392,6 +392,29 @@ export interface SuperAdminCreateResponse {
   super_admin: SuperAdminUser;
 }
 
+/** Presupuesto mensual de IA y gasto del mes de un negocio (GET /admin/ai-budgets). */
+export interface AiBudgetRow {
+  business_id: string;
+  name: string | null;
+  presupuesto_guardado_usd: number | null;
+  /** El que realmente aplica: si el negocio no tiene uno guardado, rige el valor por defecto. */
+  presupuesto_efectivo_usd: number;
+  gasto_mes_usd: number;
+  porcentaje_usado: number | null;
+}
+
+export interface AiBudgetsResponse {
+  presupuestos: AiBudgetRow[];
+  presupuesto_por_defecto_usd: number;
+  /** Si el corte duro esta activo, al llegar al 100 % el asistente se pausa para ese negocio. */
+  corte_duro_activo: boolean;
+}
+
+export interface AiBudgetUpdateResponse {
+  business_id: string;
+  monthly_ai_budget_usd: number;
+}
+
 export interface AdminBusinessCreate {
   name: string;
   business_type?: string | null;
