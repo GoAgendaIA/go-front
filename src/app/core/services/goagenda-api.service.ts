@@ -20,6 +20,7 @@ import {
   BusinessChatReplyInput,
   BusinessHoursListResponse,
   BusinessInfoUpdate,
+  BusinessAddressUpdate,
   BusinessSettings,
   BusinessSettingsResponse,
   ChatConfig,
@@ -272,6 +273,12 @@ export class GoagendaApiService {
 
   updateBusinessInfo(payload: BusinessInfoUpdate): Observable<BusinessSettings> {
     return this.http.put<BusinessSettings>(`${GOAGENDA_API_URL}/business-settings/info`, payload);
+  }
+
+  updateBusinessAddress(payload: BusinessAddressUpdate): Observable<BusinessSettings> {
+    return this.http
+      .put<BusinessSettingsResponse>(`${GOAGENDA_API_URL}/business-settings/address`, payload)
+      .pipe(map((response) => response.business));
   }
 
   updateReminderConfig(payload: ReminderConfigUpdate): Observable<BusinessSettings> {

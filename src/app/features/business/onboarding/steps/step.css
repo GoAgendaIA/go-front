@@ -117,3 +117,15 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.step-subtitle {
+  margin: 0.4rem 0 0;
+  color: var(--go-navy);
+  font-size: 1.05rem;
+}
+
+.lead-inline {
+  margin: -0.9rem 0 0;
+  color: color-mix(in srgb, var(--go-dark) 62%, white);
+  font-size: 0.88rem;
+}

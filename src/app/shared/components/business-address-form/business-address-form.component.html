@@ -1,0 +1,86 @@
+<div class="address" [formGroup]="form">
+  @if (error()) {
+    <p class="error-banner" role="alert">{{ error() }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="hint">Cargando direccion...</p>
+  } @else {
+    <div class="kinds" role="radiogroup" aria-label="Como quieres indicar la direccion">
+      @for (kind of kinds; track kind.value) {
+        <button
+          type="button"
+          role="radio"
+          class="kind"
+          [class.active]="form.controls.kind.value === kind.value"
+          [attr.aria-checked]="form.controls.kind.value === kind.value"
+          (click)="selectKind(kind.value)"
+        >
+          {{ kind.label }}
+        </button>
+      }
+    </div>
+
+    <label class="field">
+      <span class="label">Direccion del negocio</span>
+      <textarea
+        formControlName="address"
+        rows="2"
+        [placeholder]="currentKind.placeholder"
+        [attr.maxlength]="300"
+        [class.has-error]="addressError"
+      ></textarea>
+      <span class="hint">{{ currentKind.hint }}</span>
+      @if (addressError) {
+        <span class="field-error">{{ addressError }}</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="label">Municipio, barrio o vereda <span class="optional">(opcional)</span></span>
+      <input type="text" formControlName="city" placeholder="Ej. Envigado, barrio Zuñiga" maxlength="120" />
+    </label>
+
+    <label class="field">
+      <span class="label">Indicaciones para llegar <span class="optional">(opcional)</span></span>
+      <input type="text" formControlName="notes" placeholder="Ej. Segundo piso, al lado de la farmacia" maxlength="300" />
+    </label>
+
+    <div class="location">
+      <div class="location-head">
+        <span class="label">Ubicacion en el mapa <span class="optional">(opcional)</span></span>
+        @if (mapUrl) {
+          <a [href]="mapUrl" target="_blank" rel="noopener noreferrer">Ver en el mapa</a>
+        }
+      </div>
+
+      @if (mapUrl) {
+        <p class="hint">Ubicacion guardada ({{ lat() }}, {{ lng() }}). La usaremos para compartirla con tus clientes.</p>
+        <div class="location-actions">
+          <app-button type="button" variant="ghost" [loading]="isLocating()" (click)="useMyLocation()">Actualizar ubicacion</app-button>
+          <app-button type="button" variant="ghost" (click)="clearLocation()">Quitar</app-button>
+        </div>
+      } @else {
+        <p class="hint">Estando en tu negocio, toca el boton para marcar el punto exacto con la ubicacion de este dispositivo.</p>
+        <app-button type="button" variant="ghost" [loading]="isLocating()" (click)="useMyLocation()">
+          <app-lucide-icon name="map-pin" [size]="18" [strokeWidth]="1.9" />
+          Usar mi ubicacion
+        </app-button>
+      }
+
+      @if (locationError()) {
+        <p class="field-error">{{ locationError() }}</p>
+      }
+    </div>
+
+    @if (successMessage()) {
+      <p class="success">{{ successMessage() }}</p>
+    }
+
+    @if (showSaveButton) {
+      <app-button type="button" [loading]="isSaving()" (click)="save()">
+        {{ isSaving() ? 'Guardando...' : 'Guardar direccion' }}
+      </app-button>
+    }
+  }
+</div>

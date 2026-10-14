@@ -1,15 +1,16 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { GoagendaApiService } from '../../../../core/services/goagenda-api.service';
 import { SessionService } from '../../../../core/services/session.service';
+import { BusinessAddressFormComponent } from '../../../../shared/components/business-address-form/business-address-form.component';
 import { UiButtonComponent } from '../../../../shared/components/ui-button/ui-button.component';
 import { UiTextFieldComponent } from '../../../../shared/components/ui-text-field/ui-text-field.component';
 import { WHATSAPP_PHONE_PATTERN, notBlankValidator } from '../../../../shared/utils/form-validators';
 
 @Component({
   selector: 'app-onboarding-business-info',
-  imports: [ReactiveFormsModule, UiButtonComponent, UiTextFieldComponent],
+  imports: [ReactiveFormsModule, UiButtonComponent, UiTextFieldComponent, BusinessAddressFormComponent],
   templateUrl: './business-info-step.component.html',
   styleUrl: './step.css'
 })
@@ -19,6 +20,7 @@ export class BusinessInfoStepComponent implements OnInit {
   private readonly sessionService = inject(SessionService);
 
   @Input({ required: true }) businessId!: string;
+  @ViewChild(BusinessAddressFormComponent) private readonly addressForm?: BusinessAddressFormComponent;
   @Output() readonly next = new EventEmitter<void>();
   @Output() readonly back = new EventEmitter<void>();
 
@@ -90,8 +92,11 @@ export class BusinessInfoStepComponent implements OnInit {
   }
 
   async submit(): Promise<void> {
-    if (this.form.invalid || this.isSaving()) {
+    // La direccion es obligatoria para terminar el onboarding: se valida junto con el resto.
+    const addressFormInvalid = this.addressForm?.form.invalid ?? false;
+    if (this.form.invalid || addressFormInvalid || this.isSaving()) {
       this.form.markAllAsTouched();
+      this.addressForm?.form.markAllAsTouched();
       return;
     }
 
@@ -107,6 +112,10 @@ export class BusinessInfoStepComponent implements OnInit {
 
       if (employeeId) {
         await firstValueFrom(this.apiService.updateEmployee(employeeId, { name: owner_name.trim() }));
+      }
+
+      if (this.addressForm && !(await this.addressForm.save())) {
+        return;
       }
 
       this.next.emit();

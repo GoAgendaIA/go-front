@@ -45,10 +45,29 @@ export interface ServiceUpdate extends ServicePaymentFields {
   offers_home_visit?: boolean;
 }
 
+export type BusinessAddressKind = 'formal' | 'referencias';
+
 export interface BusinessSettings {
   name: string;
   phone_number: string | null;
   reminder_hours_before: number;
+  /** Direccion del negocio (texto libre). Null en negocios anteriores a que se pidiera. */
+  address?: string | null;
+  address_kind?: BusinessAddressKind | null;
+  address_city?: string | null;
+  address_notes?: string | null;
+  address_lat?: number | null;
+  address_lng?: number | null;
+}
+
+export interface BusinessAddressUpdate {
+  business_id: string;
+  address: string;
+  address_kind: BusinessAddressKind;
+  address_city?: string | null;
+  address_notes?: string | null;
+  address_lat?: number | null;
+  address_lng?: number | null;
 }
 
 /** Respuesta cruda de GET /business-settings: el negocio viene envuelto bajo la clave "business". */

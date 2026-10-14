@@ -31,6 +31,10 @@
     />
   </div>
 
+  <h2 class="step-subtitle">¿Donde queda tu negocio?</h2>
+  <p class="lead-inline">Tus clientes la veran en el mensaje de confirmacion de su cita.</p>
+  <app-business-address-form [businessId]="businessId" />
+
   <div class="step-actions">
     <app-button type="submit" [loading]="isSaving()">Continuar</app-button>
     <app-button type="button" variant="ghost" [disabled]="isSaving()" (click)="back.emit()">Atras</app-button>
