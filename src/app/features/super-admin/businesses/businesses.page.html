@@ -31,9 +31,30 @@
                   <span class="badge badge-blocked">Bloqueado</span>
                 }
               </div>
+
+              @if (budgetOf(business); as budget) {
+                <div class="budget" [class]="'budget budget-' + budgetState(budget)">
+                  <div class="budget-head">
+                    <span>IA este mes</span>
+                    <strong>
+                      US$ {{ budget.gasto_mes_usd.toFixed(2) }} de US$ {{ budget.presupuesto_efectivo_usd.toFixed(2) }}
+                      @if (budget.presupuesto_guardado_usd === null) {
+                        <small>(por defecto)</small>
+                      }
+                    </strong>
+                  </div>
+                  <div class="budget-track">
+                    <div class="budget-fill" [style.width.%]="budgetBarWidth(budget)"></div>
+                  </div>
+                </div>
+              }
             </div>
 
             <div class="business-actions">
+              <app-button type="button" variant="ghost" [fit]="true" (click)="openBudgetModal(business)">
+                <app-lucide-icon name="credit-card" [size]="16" [strokeWidth]="2" />
+                Presupuesto IA
+              </app-button>
               <app-button type="button" variant="ghost" [fit]="true" (click)="generateOwnerCode(business)">
                 <app-lucide-icon name="send" [size]="16" [strokeWidth]="2" />
                 Generar codigo de dueño
@@ -96,5 +117,46 @@
         </app-button>
       </div>
     </div>
+  </app-modal>
+}
+
+@if (budgetTarget(); as target) {
+  <app-modal title="Presupuesto mensual de IA" (close)="closeBudgetModal()">
+    <form class="modal-form" (submit)="$event.preventDefault(); saveBudget()">
+      <p class="confirm-text">
+        Tope mensual de gasto en IA para <strong>{{ target.name }}</strong>, en dólares (US$).
+      </p>
+
+      <label class="budget-field">
+        <span>Presupuesto mensual (US$)</span>
+        <input
+          type="number"
+          inputmode="decimal"
+          min="0.01"
+          max="1000"
+          step="0.5"
+          name="budget"
+          [value]="budgetInput()"
+          (input)="budgetInput.set($any($event.target).value)"
+        />
+      </label>
+
+      <p class="hint-small">
+        Si el negocio no tiene uno guardado, aplica el valor por defecto (US$ {{ defaultBudgetUsd() }}).
+        @if (hardCutoffActive()) {
+          Con el corte duro activo, al llegar al 100 % el asistente se pausa para este negocio y el dueño recibe un aviso.
+        } @else {
+          El corte duro está apagado: al llegar al 80 % el dueño recibe un aviso, pero el asistente sigue respondiendo.
+        }
+      </p>
+
+      @if (budgetError()) {
+        <p class="error-banner" role="alert">{{ budgetError() }}</p>
+      }
+
+      <app-button type="submit" [loading]="isSavingBudget()">
+        {{ isSavingBudget() ? 'Guardando...' : 'Guardar presupuesto' }}
+      </app-button>
+    </form>
   </app-modal>
 }

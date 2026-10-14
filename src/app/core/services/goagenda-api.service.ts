@@ -6,6 +6,8 @@ import { GOAGENDA_API_URL } from '../config/goagenda-api.config';
 import { AppointmentsListResponse, ListAppointmentsParams } from '../models/appointment.model';
 import {
   AdminBusiness,
+  AiBudgetsResponse,
+  AiBudgetUpdateResponse,
   AdminBusinessCreate,
   AdminBusinessCreateResponse,
   AdminBusinessesListResponse,
@@ -123,6 +125,17 @@ export class GoagendaApiService {
     return this.http
       .post<InvitationCodeResponse>(`${GOAGENDA_API_URL}/admin/businesses/${businessId}/invitation-codes`, {})
       .pipe(map((response) => response.invitation_code));
+  }
+
+  // Presupuesto mensual de IA por negocio (super admin)
+  adminListAiBudgets(): Observable<AiBudgetsResponse> {
+    return this.http.get<AiBudgetsResponse>(`${GOAGENDA_API_URL}/admin/ai-budgets`);
+  }
+
+  adminSetAiBudget(businessId: string, monthlyAiBudgetUsd: number): Observable<AiBudgetUpdateResponse> {
+    return this.http.put<AiBudgetUpdateResponse>(`${GOAGENDA_API_URL}/admin/businesses/${businessId}/ai-budget`, {
+      monthly_ai_budget_usd: monthlyAiBudgetUsd
+    });
   }
 
   // Cuentas de administracion (super admins)
