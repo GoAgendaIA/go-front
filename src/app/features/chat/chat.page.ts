@@ -5,6 +5,7 @@ import { TimeoutError, firstValueFrom, timeout } from 'rxjs';
 import { ChatHistoryResponse, ChatMessageResponse, ChatOption } from '../../core/models/goagenda.models';
 import { GoagendaApiService } from '../../core/services/goagenda-api.service';
 import { LucideIconComponent } from '../../shared/components/lucide-icon/lucide-icon.component';
+import { userMessageForSendError } from './send-error-message';
 
 const SESSION_KEY_PREFIX = 'goagenda_chat_session_';
 const SOUND_PREF_KEY = 'goagenda_chat_sound_enabled';
@@ -237,7 +238,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       // burbuja que parece enviada pero no llego) para reenviarlo con un toque.
       this.messages.update((current) => current.filter((item) => item !== bubble));
       this.draft.set(text);
-      this.errorMessage.set('No se pudo enviar el mensaje. Revisa tu conexion y toca enviar de nuevo.');
+      this.errorMessage.set(userMessageForSendError(error));
     } finally {
       this.isSending.set(false);
       this.queueScroll();
