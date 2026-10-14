@@ -7,6 +7,7 @@ import { GOAGENDA_API_URL } from '../../../core/config/goagenda-api.config';
 import { GoagendaApiService } from '../../../core/services/goagenda-api.service';
 import { SessionService } from '../../../core/services/session.service';
 import { SupabaseAuthService } from '../../../core/services/supabase-auth.service';
+import { BusinessAddressFormComponent } from '../../../shared/components/business-address-form/business-address-form.component';
 import { ChatLinkQrCardComponent } from '../../../shared/components/chat-link-qr-card/chat-link-qr-card.component';
 import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
 import { UiButtonComponent } from '../../../shared/components/ui-button/ui-button.component';
@@ -26,6 +27,7 @@ import { CopCurrencyPipe } from '../../../shared/pipes/cop-currency.pipe';
     UiTextFieldComponent,
     UiModalComponent,
     ChatLinkQrCardComponent,
+    BusinessAddressFormComponent,
     CopCurrencyPipe,
     DatePipe
   ],
