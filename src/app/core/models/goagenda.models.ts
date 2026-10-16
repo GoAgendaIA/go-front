@@ -676,7 +676,13 @@ export interface MetricsResponse {
     citas_por_dia_semana: { dia: string; total: number }[];
     citas_por_hora: { hora: number; total: number }[];
     domicilios: { total: number; porcentaje: number | null };
-    ingresos_estimados: { completadas: number; por_realizar: number; recargos_domicilio: number };
+    ingresos_estimados: {
+      completadas: number;
+      por_realizar: number;
+      /** Cantidad de citas futuras que suman "por realizar". Opcional: el backend anterior no lo enviaba. */
+      citas_por_realizar?: number;
+      recargos_domicilio: number;
+    };
   };
   comparacion?: Record<
     'citas_creadas' | 'clientes_unicos' | 'citas_ia' | 'citas_manuales' | 'tasa_cancelacion' | 'conversion' | 'costo_ia_usd',

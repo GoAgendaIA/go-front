@@ -243,14 +243,25 @@
             <h2>Ingresos estimados</h2>
             <dl class="facts big">
               <div><dt>Citas completadas</dt><dd>{{ d.rendimiento.ingresos_estimados.completadas | copCurrency }}</dd></div>
-              <div><dt>Por realizar (confirmadas)</dt><dd>{{ d.rendimiento.ingresos_estimados.por_realizar | copCurrency }}</dd></div>
+              <div>
+                <dt>
+                  Por realizar (citas futuras)
+                  @if (d.rendimiento.ingresos_estimados.citas_por_realizar !== undefined) {
+                    <small>{{ d.rendimiento.ingresos_estimados.citas_por_realizar }} {{ d.rendimiento.ingresos_estimados.citas_por_realizar === 1 ? 'cita' : 'citas' }}</small>
+                  }
+                </dt>
+                <dd>{{ d.rendimiento.ingresos_estimados.por_realizar | copCurrency }}</dd>
+              </div>
               <div><dt>Recargos de domicilio</dt><dd>{{ d.rendimiento.ingresos_estimados.recargos_domicilio | copCurrency }}</dd></div>
               <div>
                 <dt>Citas a domicilio</dt>
                 <dd>{{ d.rendimiento.domicilios.total }} <small>({{ percent(d.rendimiento.domicilios.porcentaje) }})</small></dd>
               </div>
             </dl>
-            <p class="note">Usa el precio actual de cada servicio, no el valor realmente cobrado.</p>
+            <p class="note">
+              Completadas: citas del periodo que ya ocurrieron y no se cancelaron. Por realizar: todas las citas futuras,
+              sin importar el periodo elegido. Usa el precio actual de cada servicio, no el valor realmente cobrado.
+            </p>
           </section>
         </div>
 
