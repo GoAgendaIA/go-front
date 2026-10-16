@@ -10,6 +10,7 @@ import { RealtimeService } from '../../../core/services/realtime.service';
 import { SessionService } from '../../../core/services/session.service';
 import { AppointmentStatus } from '../../../core/models/appointment.model';
 import { Employee, ServiceItem } from '../../../core/models/goagenda.models';
+import { AppointmentCardComponent } from '../../../shared/components/appointment-card/appointment-card.component';
 import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
 import { UiButtonComponent } from '../../../shared/components/ui-button/ui-button.component';
 import { UiModalComponent } from '../../../shared/components/ui-modal/ui-modal.component';
@@ -39,17 +40,17 @@ interface AppointmentView {
   scheduledAt: Date;
 }
 
-const STATUS_LABELS: Record<AppointmentStatus, string> = {
-  pending: 'Pendiente',
-  pending_payment: 'Pago pendiente',
-  confirmed: 'Confirmada',
-  completed: 'Completada',
-  cancelled: 'Cancelada'
-};
-
 @Component({
   selector: 'app-appointments-page',
-  imports: [ReactiveFormsModule, LucideIconComponent, UiButtonComponent, UiModalComponent, UiTextFieldComponent, CopCurrencyPipe],
+  imports: [
+    ReactiveFormsModule,
+    AppointmentCardComponent,
+    LucideIconComponent,
+    UiButtonComponent,
+    UiModalComponent,
+    UiTextFieldComponent,
+    CopCurrencyPipe
+  ],
   templateUrl: './appointments.page.html',
   styleUrl: './appointments.page.css'
 })
@@ -310,10 +311,6 @@ export class AppointmentsPageComponent implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  statusLabel(status: AppointmentStatus): string {
-    return STATUS_LABELS[status];
   }
 
   /** Ya paso la hora de esta cita (comparado contra el momento en que se pinta la tarjeta) - se pinta atenuada en el calendario. */

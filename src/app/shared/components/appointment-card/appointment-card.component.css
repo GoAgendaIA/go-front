@@ -1,0 +1,175 @@
+:host {
+  display: block;
+}
+
+.card {
+  --accent: #3f73c0;
+  --soft: #bbddff;
+  --soft-strong: #3a6fbf;
+
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.05rem 1.2rem 1.05rem 1rem;
+  background: #f8f8f8;
+  border-radius: 1.4rem;
+  /* La franja de color sigue la curva de la esquina, como en el diseño. */
+  border-left: 0.4rem solid var(--accent);
+}
+
+.state-completed {
+  --accent: #3cb371;
+  --soft: #bffccb;
+  --soft-strong: #2e9a57;
+}
+
+.state-cancelled {
+  --accent: #c24141;
+  --soft: #ffcdcd;
+  --soft-strong: #cb4444;
+}
+
+.state-pending {
+  --accent: #d99a1f;
+  --soft: #ffeebd;
+  --soft-strong: #a06c0f;
+}
+
+.icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 3.4rem;
+  height: 3.4rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--soft-strong);
+}
+
+.state-cancelled .icon {
+  color: #f25c5c;
+}
+
+.glyph {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+/* Reloj pequeño en la esquina inferior derecha del icono de "completada". */
+.icon-badge {
+  position: absolute;
+  right: -0.25rem;
+  bottom: -0.2rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--soft-strong);
+}
+
+.icon-badge svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.client {
+  margin: 0;
+  color: #666;
+  font-size: 1.12rem;
+  font-weight: 500;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+.service {
+  margin: 0.1rem 0 0;
+  color: #6f6f6f;
+  font-size: 0.98rem;
+}
+
+.state-cancelled .client {
+  text-decoration: line-through;
+  text-decoration-color: #f25c5c;
+  text-decoration-thickness: 0.12rem;
+}
+
+.state-cancelled .service {
+  color: #a3a3a3;
+}
+
+.details {
+  margin: 0.35rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.7rem;
+  color: #8a8a8a;
+  font-size: 0.82rem;
+}
+
+.state-cancelled .details {
+  color: #b5b5b5;
+}
+
+.pill {
+  flex-shrink: 0;
+  padding: 0.45rem 1.05rem;
+  border-radius: 0.8rem;
+  background: var(--soft);
+  color: var(--soft-strong);
+  font-size: 0.98rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Cita recien creada o resaltada desde una notificacion. */
+.highlighted {
+  animation: highlight-pulse 2.2s ease-out;
+}
+
+@keyframes highlight-pulse {
+  0%,
+  35% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 55%, white);
+    background: color-mix(in srgb, var(--accent) 12%, white);
+  }
+
+  100% {
+    box-shadow: none;
+    background: #f8f8f8;
+  }
+}
+
+/* Telefonos: el texto necesita todo el ancho que pueda; la etiqueta pasa a la fila de abajo,
+   alineada con el texto, en vez de apretarlo contra el icono. */
+@media (max-width: 480px) {
+  .card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.55rem 0.85rem;
+  }
+
+  .icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .glyph {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .pill {
+    grid-column: 2;
+    justify-self: start;
+    font-size: 0.9rem;
+    padding: 0.35rem 0.9rem;
+  }
+}
