@@ -1,0 +1,42 @@
+:host {
+  display: inline-block;
+  min-width: 0;
+}
+
+.time-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  background: var(--go-bg);
+  border-radius: 0.6rem;
+  padding: 0.15rem 0.25rem;
+  color: var(--go-navy);
+}
+
+select {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.1rem;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+select:focus-visible {
+  outline: 2px solid var(--go-teal);
+  outline-offset: 1px;
+  border-radius: 0.4rem;
+}
+
+.period {
+  margin-left: 0.15rem;
+}
+
+.colon {
+  font-weight: 700;
+}

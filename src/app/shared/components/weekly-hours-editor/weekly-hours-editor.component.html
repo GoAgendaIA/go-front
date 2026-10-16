@@ -33,9 +33,9 @@
                 Atencion
               </span>
               <span class="time-range">
-                <input type="time" [attr.aria-label]="'Hora de apertura, ' + day.label" [(ngModel)]="day.openingTime" (change)="onTimeChange(day)" />
+                <app-time-field [ariaLabel]="'Hora de apertura, ' + day.label" [ngModel]="day.openingTime" (ngModelChange)="day.openingTime = $event; onTimeChange(day)" />
                 <span>-</span>
-                <input type="time" [attr.aria-label]="'Hora de cierre, ' + day.label" [(ngModel)]="day.closingTime" (change)="onTimeChange(day)" />
+                <app-time-field [ariaLabel]="'Hora de cierre, ' + day.label" [ngModel]="day.closingTime" (ngModelChange)="day.closingTime = $event; onTimeChange(day)" />
               </span>
             </div>
 
@@ -45,9 +45,9 @@
                 Almuerzo
               </span>
               <span class="time-range">
-                <input type="time" [attr.aria-label]="'Inicio de almuerzo, ' + day.label" [(ngModel)]="day.lunchStart" (change)="onTimeChange(day)" />
+                <app-time-field [ariaLabel]="'Inicio de almuerzo, ' + day.label" [ngModel]="day.lunchStart" (ngModelChange)="day.lunchStart = $event; onTimeChange(day)" />
                 <span>-</span>
-                <input type="time" [attr.aria-label]="'Fin de almuerzo, ' + day.label" [(ngModel)]="day.lunchEnd" (change)="onTimeChange(day)" />
+                <app-time-field [ariaLabel]="'Fin de almuerzo, ' + day.label" [ngModel]="day.lunchEnd" (ngModelChange)="day.lunchEnd = $event; onTimeChange(day)" />
               </span>
             </div>
           </div>

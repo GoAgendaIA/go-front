@@ -1,0 +1,17 @@
+<span class="time-field" role="group" [attr.aria-label]="ariaLabel">
+  <select [attr.aria-label]="ariaLabel + ', hora'" [disabled]="disabled()" (change)="onHour($event)">
+    @for (hour of hours; track hour) {
+      <option [value]="hour" [selected]="hour === parts().hour">{{ hour }}</option>
+    }
+  </select>
+  <span class="colon" aria-hidden="true">:</span>
+  <select [attr.aria-label]="ariaLabel + ', minutos'" [disabled]="disabled()" (change)="onMinute($event)">
+    @for (minute of minutes(); track minute) {
+      <option [value]="minute" [selected]="minute === parts().minute">{{ pad(minute) }}</option>
+    }
+  </select>
+  <select class="period" [attr.aria-label]="ariaLabel + ', a. m. o p. m.'" [disabled]="disabled()" (change)="onPeriod($event)">
+    <option value="am" [selected]="parts().period === 'am'">a. m.</option>
+    <option value="pm" [selected]="parts().period === 'pm'">p. m.</option>
+  </select>
+</span>

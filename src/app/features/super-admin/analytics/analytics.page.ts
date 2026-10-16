@@ -16,6 +16,7 @@ import { BarChartComponent, BarChartSeries } from '../../../shared/components/ba
 import { DonutChartComponent, DonutSlice } from '../../../shared/components/donut-chart/donut-chart.component';
 import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
 import { CopCurrencyPipe } from '../../../shared/pipes/cop-currency.pipe';
+import { formatHourLabel } from '../../../shared/utils/date-utils';
 
 type PeriodPreset = '7' | '30' | '90' | 'custom';
 
@@ -195,7 +196,7 @@ export class AnalyticsPageComponent implements OnInit {
   ]);
 
   readonly hourLabels = computed(() =>
-    (this.data()?.rendimiento.citas_por_hora ?? []).map((h) => `${String(h.hora).padStart(2, '0')}h`)
+    (this.data()?.rendimiento.citas_por_hora ?? []).map((h) => formatHourLabel(h.hora))
   );
   readonly hourSeries = computed<BarChartSeries[]>(() => [
     {

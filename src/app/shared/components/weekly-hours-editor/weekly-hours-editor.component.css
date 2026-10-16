@@ -118,16 +118,3 @@
   color: color-mix(in srgb, var(--go-dark) 55%, white);
 }
 
-.time-range input {
-  border: 0;
-  background: var(--go-bg);
-  border-radius: 0.6rem;
-  padding: 0.4rem 0.4rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--go-navy);
-  width: 100%;
-  min-width: 0;
-  flex: 1 1 5.6rem;
-  max-width: 6.4rem;
-}
