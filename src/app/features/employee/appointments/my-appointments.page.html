@@ -3,6 +3,10 @@
     <p class="error-banner" role="alert">{{ error() }}</p>
   }
 
+  @if (notice()) {
+    <p class="notice-banner" role="status">{{ notice() }}</p>
+  }
+
   <article class="calendar-card">
     <div class="calendar-nav">
       <button type="button" class="nav-btn" (click)="shiftWeek(-7)" aria-label="Semana anterior">
@@ -64,9 +68,23 @@
             [price]="appointment.price"
             [phone]="appointment.clientPhone"
             [isPast]="isPastAppointment(appointment)"
+            [cancellable]="true"
+            (cancelRequested)="openCancel(appointment)"
           />
         }
       </div>
     }
   </div>
 </section>
+
+@if (cancelTarget(); as target) {
+  <app-cancel-appointment-dialog
+    [clientName]="target.clientName"
+    [serviceName]="target.serviceName"
+    [time]="target.time"
+    [hasPhone]="!!target.clientPhone"
+    [isLoading]="isCancelling()"
+    (confirmed)="confirmCancel()"
+    (dismissed)="closeCancel()"
+  />
+}

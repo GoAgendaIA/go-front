@@ -1,0 +1,29 @@
+<app-modal title="Cancelar cita" (close)="dismissed.emit()">
+  <div class="dialog">
+    <p class="question">¿Seguro que quieres cancelar esta cita?</p>
+
+    <div class="summary">
+      <strong>{{ clientName }}</strong>
+      <span>{{ serviceName }}</span>
+      @if (time) {
+        <span>{{ time }}</span>
+      }
+    </div>
+
+    <p class="hint">
+      @if (hasPhone) {
+        Le enviaremos un mensaje de WhatsApp al cliente avisando la cancelación. El horario quedará libre.
+      } @else {
+        Este cliente no tiene un WhatsApp registrado, así que no recibirá aviso: coméntaselo por otro medio. El horario
+        quedará libre.
+      }
+    </p>
+
+    <div class="actions">
+      <app-button type="button" variant="ghost" [disabled]="isLoading" (click)="dismissed.emit()">Mantener cita</app-button>
+      <app-button type="button" [loading]="isLoading" (click)="confirmed.emit()">
+        {{ isLoading ? 'Cancelando...' : 'Sí, cancelar' }}
+      </app-button>
+    </div>
+  </div>
+</app-modal>

@@ -695,3 +695,15 @@ export interface MetricsResponse {
   /** Solo en el panel individual. */
   negocio?: MetricsBusinessRow;
 }
+
+
+/** Que paso con el aviso de cancelacion por WhatsApp al cliente. */
+export type CancellationNotice = 'enviado' | 'sin_whatsapp' | 'no_disponible' | 'fallo';
+
+/** Respuesta de POST /appointments/{id}/cancel. */
+export interface CancelAppointmentResponse {
+  cita: { id: string; status: string };
+  aviso_cliente: CancellationNotice;
+  /** La cita ya tenia un abono pagado: hay que coordinar la devolucion con el cliente. */
+  tiene_pago: boolean;
+}

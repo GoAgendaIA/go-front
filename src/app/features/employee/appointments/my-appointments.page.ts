@@ -4,6 +4,8 @@ import { AppointmentStatus } from '../../../core/models/appointment.model';
 import { GoagendaApiService } from '../../../core/services/goagenda-api.service';
 import { RealtimeService } from '../../../core/services/realtime.service';
 import { SessionService } from '../../../core/services/session.service';
+import { CancelAppointmentDialogComponent } from '../../../shared/components/cancel-appointment-dialog/cancel-appointment-dialog.component';
+import { cancellationError, cancellationNotice } from '../../../shared/utils/cancel-appointment-messages';
 import { AppointmentCardComponent } from '../../../shared/components/appointment-card/appointment-card.component';
 import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
 import {
@@ -30,7 +32,7 @@ interface AppointmentView {
 
 @Component({
   selector: 'app-my-appointments-page',
-  imports: [AppointmentCardComponent, LucideIconComponent],
+  imports: [AppointmentCardComponent, CancelAppointmentDialogComponent, LucideIconComponent],
   templateUrl: './my-appointments.page.html',
   styleUrl: './my-appointments.page.css'
 })
@@ -44,6 +46,9 @@ export class MyAppointmentsPageComponent implements OnInit {
   readonly appointments = signal<AppointmentView[]>([]);
   readonly isLoading = signal(false);
   readonly error = signal('');
+  readonly notice = signal('');
+  readonly cancelTarget = signal<AppointmentView | null>(null);
+  readonly isCancelling = signal(false);
 
   readonly weekDays = computed(() => getWeekDays(this.selectedDate()));
   readonly monthLabel = computed(() => formatMonthYear(this.selectedDate()));
@@ -72,6 +77,38 @@ export class MyAppointmentsPageComponent implements OnInit {
 
   ngOnInit(): void {
     void this.loadAppointments();
+  }
+
+  openCancel(appointment: AppointmentView): void {
+    this.notice.set('');
+    this.error.set('');
+    this.cancelTarget.set(appointment);
+  }
+
+  closeCancel(): void {
+    if (!this.isCancelling()) {
+      this.cancelTarget.set(null);
+    }
+  }
+
+  async confirmCancel(): Promise<void> {
+    const target = this.cancelTarget();
+    if (!target || this.isCancelling()) {
+      return;
+    }
+
+    this.isCancelling.set(true);
+    try {
+      const result = await firstValueFrom(this.apiService.cancelAppointment(target.id));
+      this.cancelTarget.set(null);
+      this.notice.set(cancellationNotice(result));
+      await this.loadAppointments();
+    } catch (error) {
+      this.cancelTarget.set(null);
+      this.error.set(cancellationError(error));
+    } finally {
+      this.isCancelling.set(false);
+    }
   }
 
   async loadAppointments(): Promise<void> {

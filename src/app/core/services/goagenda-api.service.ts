@@ -21,6 +21,7 @@ import {
   BusinessHoursListResponse,
   BusinessInfoUpdate,
   BusinessAddressUpdate,
+  CancelAppointmentResponse,
   BusinessSettings,
   BusinessSettingsResponse,
   ChatConfig,
@@ -341,6 +342,14 @@ export class GoagendaApiService {
   // Citas
   createManualAppointment(payload: ManualAppointmentInput): Observable<unknown> {
     return this.http.post(`${GOAGENDA_API_URL}/appointments/manual`, payload);
+  }
+
+  /** Cancela una cita desde el panel (no la borra) y avisa al cliente por WhatsApp si se puede. */
+  cancelAppointment(appointmentId: string): Observable<CancelAppointmentResponse> {
+    return this.http.post<CancelAppointmentResponse>(
+      `${GOAGENDA_API_URL}/appointments/${encodeURIComponent(appointmentId)}/cancel`,
+      {}
+    );
   }
 
   listAppointments(params: ListAppointmentsParams): Observable<AppointmentsListResponse> {

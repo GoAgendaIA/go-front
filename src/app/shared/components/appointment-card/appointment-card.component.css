@@ -131,6 +131,27 @@
   white-space: nowrap;
 }
 
+/* Accion secundaria: texto sencillo en rojo, sin competir con la etiqueta de estado. */
+.cancel-btn {
+  margin-top: 0.5rem;
+  padding: 0.25rem 0;
+  border: 0;
+  background: transparent;
+  color: #c24141;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15rem;
+}
+
+.cancel-btn:focus-visible {
+  outline: 2px solid #c24141;
+  outline-offset: 2px;
+  border-radius: 0.3rem;
+}
+
 /* Cita recien creada o resaltada desde una notificacion. */
 .highlighted {
   animation: highlight-pulse 2.2s ease-out;

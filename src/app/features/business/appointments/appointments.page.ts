@@ -10,6 +10,8 @@ import { RealtimeService } from '../../../core/services/realtime.service';
 import { SessionService } from '../../../core/services/session.service';
 import { AppointmentStatus } from '../../../core/models/appointment.model';
 import { Employee, ServiceItem } from '../../../core/models/goagenda.models';
+import { CancelAppointmentDialogComponent } from '../../../shared/components/cancel-appointment-dialog/cancel-appointment-dialog.component';
+import { cancellationError, cancellationNotice } from '../../../shared/utils/cancel-appointment-messages';
 import { AppointmentCardComponent } from '../../../shared/components/appointment-card/appointment-card.component';
 import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
 import { UiButtonComponent } from '../../../shared/components/ui-button/ui-button.component';
@@ -46,6 +48,7 @@ interface AppointmentView {
   imports: [
     ReactiveFormsModule,
     AppointmentCardComponent,
+    CancelAppointmentDialogComponent,
     LucideIconComponent,
     UiButtonComponent,
     UiModalComponent,
@@ -68,6 +71,9 @@ export class AppointmentsPageComponent implements OnInit {
   readonly isModalOpen = signal(false);
   readonly isSaving = signal(false);
   readonly error = signal('');
+  readonly notice = signal('');
+  readonly cancelTarget = signal<AppointmentView | null>(null);
+  readonly isCancelling = signal(false);
   readonly agendaFilter = signal('');
   readonly availableSlots = signal<string[]>([]);
   readonly isLoadingSlots = signal(false);
@@ -271,6 +277,38 @@ export class AppointmentsPageComponent implements OnInit {
       this.employees.set(employees);
     } catch {
       this.error.set('No se pudo cargar la lista de empleados.');
+    }
+  }
+
+  openCancel(appointment: AppointmentView): void {
+    this.notice.set('');
+    this.error.set('');
+    this.cancelTarget.set(appointment);
+  }
+
+  closeCancel(): void {
+    if (!this.isCancelling()) {
+      this.cancelTarget.set(null);
+    }
+  }
+
+  async confirmCancel(): Promise<void> {
+    const target = this.cancelTarget();
+    if (!target || this.isCancelling()) {
+      return;
+    }
+
+    this.isCancelling.set(true);
+    try {
+      const result = await firstValueFrom(this.apiService.cancelAppointment(target.id));
+      this.cancelTarget.set(null);
+      this.notice.set(cancellationNotice(result));
+      await this.loadAppointments();
+    } catch (error) {
+      this.cancelTarget.set(null);
+      this.error.set(cancellationError(error));
+    } finally {
+      this.isCancelling.set(false);
     }
   }
 
