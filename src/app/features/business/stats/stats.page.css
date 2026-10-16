@@ -1,0 +1,536 @@
+:host {
+  display: grid;
+  gap: 1.1rem;
+  padding: 1.1rem 1.1rem 4rem;
+  align-content: start;
+}
+
+/* ---- Encabezado y periodo ---- */
+.page-header h1 {
+  margin: 0 0 0.2rem;
+  color: var(--go-navy);
+  font-size: 1.6rem;
+}
+
+.page-header p {
+  margin: 0;
+  color: color-mix(in srgb, var(--go-dark) 62%, white);
+  font-size: 0.92rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+}
+
+.segmented {
+  display: inline-flex;
+  max-width: 100%;
+  gap: 0.15rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--go-slate-200) 70%, white);
+  overflow-x: auto;
+}
+
+.segmented button {
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: color-mix(in srgb, var(--go-dark) 70%, white);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.segmented button.active {
+  background: #fff;
+  color: var(--go-teal);
+  box-shadow: 0 1px 4px rgb(16 32 64 / 14%);
+}
+
+.caption {
+  color: color-mix(in srgb, var(--go-dark) 55%, white);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.error-banner {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in srgb, #bd2e2e 28%, white);
+  background: color-mix(in srgb, #bd2e2e 8%, white);
+  color: #7f2121;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.88rem;
+}
+
+.retry {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---- Carga ---- */
+.skeletons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.skeleton {
+  height: 8.5rem;
+  border-radius: var(--go-radius-lg);
+  background: linear-gradient(90deg, #fff 25%, #eef2f6 50%, #fff 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s infinite linear;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---- Tarjetas ---- */
+.card,
+.kpi {
+  background: #fff;
+  border-radius: var(--go-radius-lg);
+  box-shadow: 0 4px 14px rgb(16 32 64 / 6%);
+}
+
+.card {
+  display: grid;
+  gap: 1.1rem;
+  padding: 1.25rem;
+  align-content: start;
+  min-width: 0;
+}
+
+.card.empty {
+  justify-items: center;
+  text-align: center;
+  padding: 2rem 1.25rem;
+  color: var(--go-teal);
+}
+
+.card.empty h2 {
+  margin: 0;
+  color: var(--go-navy);
+  font-size: 1.1rem;
+}
+
+.card.empty p {
+  margin: 0;
+  max-width: 28rem;
+  color: color-mix(in srgb, var(--go-dark) 60%, white);
+  font-size: 0.9rem;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.card-head h2 {
+  margin: 0;
+  color: var(--go-navy);
+  font-size: 1.08rem;
+}
+
+.card-head p {
+  margin: 0.1rem 0 0;
+  color: color-mix(in srgb, var(--go-dark) 58%, white);
+  font-size: 0.84rem;
+}
+
+.card h3 {
+  margin: 0 0 0.5rem;
+  color: color-mix(in srgb, var(--go-dark) 75%, white);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* ---- Iconos ---- */
+.badge {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.85rem;
+}
+
+.badge-teal {
+  background: color-mix(in srgb, var(--go-teal) 14%, white);
+  color: var(--go-teal);
+}
+
+.badge-blue {
+  background: #e3efff;
+  color: #2f6fd1;
+}
+
+.badge-amber {
+  background: #fff1cf;
+  color: #b27a0c;
+}
+
+.badge-navy {
+  background: #e6e9f0;
+  color: var(--go-charcoal);
+}
+
+.badge-red {
+  background: #ffe3e3;
+  color: #c24141;
+}
+
+/* ---- Cifras clave ---- */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  transition: opacity 150ms ease;
+}
+
+.kpis.is-loading {
+  opacity: 0.55;
+}
+
+.kpi {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  padding: 1.05rem 1.1rem 1.1rem;
+  min-width: 0;
+}
+
+.kpi-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.kpi-label {
+  color: color-mix(in srgb, var(--go-dark) 65%, white);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.kpi-value {
+  margin-top: 0.3rem;
+  color: var(--go-navy);
+  font-size: 1.8rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.delta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+}
+
+.delta-caption {
+  color: color-mix(in srgb, var(--go-dark) 50%, white);
+  font-size: 0.74rem;
+}
+
+.delta {
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.delta.tone-up,
+.delta.tone-down {
+  white-space: nowrap;
+}
+
+.delta.tone-up {
+  background: #e1f5ea;
+  color: #1f7a4d;
+}
+
+.delta.tone-down {
+  background: #fde6e6;
+  color: #b53030;
+}
+
+.delta.tone-flat,
+.delta.tone-none {
+  background: #eef2f6;
+  color: color-mix(in srgb, var(--go-dark) 62%, white);
+}
+
+.kpi-help {
+  margin: 0.15rem 0 0;
+  color: color-mix(in srgb, var(--go-dark) 50%, white);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+small.tone-up {
+  color: #1f7a4d;
+}
+
+small.tone-down {
+  color: #b53030;
+}
+
+small.tone-flat,
+small.tone-none {
+  color: color-mix(in srgb, var(--go-dark) 55%, white);
+}
+
+/* ---- Estructura de dos columnas ---- */
+.split,
+.grid-2 {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.stack {
+  display: grid;
+  gap: 1.1rem;
+  align-content: start;
+}
+
+/* ---- Lo que aporta GoAgenda ---- */
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border-radius: 1.1rem;
+  background: linear-gradient(135deg, var(--go-teal), color-mix(in srgb, var(--go-teal) 70%, #0e182c));
+  color: #fff;
+}
+
+.hero strong {
+  font-size: 2.1rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.hero span {
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: rgb(255 255 255 / 92%);
+}
+
+.funnel,
+.ranking {
+  display: grid;
+  gap: 0.95rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.funnel-head,
+.rank-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.8rem;
+  font-size: 0.9rem;
+  color: var(--go-dark);
+}
+
+.funnel-head strong,
+.rank-head strong {
+  color: var(--go-navy);
+}
+
+.funnel-head small {
+  margin-left: 0.35rem;
+  color: var(--go-teal);
+  font-weight: 700;
+}
+
+.rank-head small {
+  color: color-mix(in srgb, var(--go-dark) 55%, white);
+  font-weight: 500;
+}
+
+.track {
+  height: 0.6rem;
+  margin-top: 0.4rem;
+  border-radius: 999px;
+  background: #eef2f6;
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  min-width: 0.35rem;
+  border-radius: 999px;
+}
+
+.fill-teal {
+  background: linear-gradient(90deg, var(--go-teal), color-mix(in srgb, var(--go-teal) 65%, white));
+}
+
+.origin {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  padding: 1rem;
+  border-radius: 1.1rem;
+  background: #f7f9fb;
+}
+
+.origin h3 {
+  margin: 0;
+}
+
+/* ---- Ranking de servicios ---- */
+.ranking li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.rank {
+  flex-shrink: 0;
+  width: 1.7rem;
+  height: 1.7rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--go-teal) 12%, white);
+  color: var(--go-teal);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.rank-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.rank-name {
+  overflow-wrap: anywhere;
+}
+
+/* ---- Cifras pequeñas ---- */
+.mini-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 0.7rem;
+}
+
+.mini {
+  display: grid;
+  gap: 0.15rem;
+  align-content: start;
+  padding: 0.85rem 0.9rem;
+  border-radius: 1rem;
+  background: #f7f9fb;
+}
+
+.mini strong {
+  color: var(--go-navy);
+  font-size: 1.45rem;
+  line-height: 1.1;
+}
+
+.mini span {
+  color: color-mix(in srgb, var(--go-dark) 62%, white);
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.mini small {
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+/* ---- Textos de apoyo ---- */
+.insight {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--go-teal) 9%, white);
+  color: var(--go-dark);
+  font-size: 0.9rem;
+}
+
+.note,
+.muted,
+.footnote {
+  margin: 0;
+  color: color-mix(in srgb, var(--go-dark) 52%, white);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.footnote {
+  text-align: center;
+  padding: 0 1rem;
+}
+
+/* Celular: las cifras de dinero ocupan todo el ancho para que ningun monto se parta en dos lineas. */
+@media (max-width: 719px) {
+  .kpi-wide {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---- Pantallas anchas ---- */
+@media (min-width: 720px) {
+  :host {
+    padding: 1.6rem 1.8rem 4rem;
+    gap: 1.3rem;
+  }
+
+  .kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .skeletons {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .split {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 1.6rem;
+  }
+
+  .grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.3rem;
+    align-items: stretch;
+  }
+}

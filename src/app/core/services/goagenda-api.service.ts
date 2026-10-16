@@ -21,6 +21,7 @@ import {
   BusinessHoursListResponse,
   BusinessInfoUpdate,
   BusinessAddressUpdate,
+  BusinessStatsResponse,
   CancelAppointmentResponse,
   BusinessSettings,
   BusinessSettingsResponse,
@@ -155,6 +156,21 @@ export class GoagendaApiService {
 
   adminRevokeSuperAdmin(userId: string): Observable<SuperAdminRevokeResponse> {
     return this.http.delete<SuperAdminRevokeResponse>(`${GOAGENDA_API_URL}/admin/super-admins/${userId}`);
+  }
+
+  // Estadisticas del propio negocio (solo el dueño)
+  getBusinessStats(businessId: string, params: MetricsParams): Observable<BusinessStatsResponse> {
+    return this.http.get<BusinessStatsResponse>(`${GOAGENDA_API_URL}/business-stats`, {
+      params: this.metricsHttpParams({ ...params, business_id: businessId } as MetricsParams)
+    });
+  }
+
+  /** Marca que el dueño ya vio el aviso de primera vez del panel de estadisticas (se recuerda en el servidor). */
+  markStatsIntroSeen(businessId: string): Observable<{ stats_intro_seen: boolean; guardado: boolean }> {
+    return this.http.put<{ stats_intro_seen: boolean; guardado: boolean }>(
+      `${GOAGENDA_API_URL}/business-settings/stats-intro-seen`,
+      { business_id: businessId }
+    );
   }
 
   // Metricas y analitica (super admin)

@@ -20,6 +20,7 @@ import { EmployeesListPageComponent } from './features/business/employees/employ
 import { HomeVisitsPageComponent } from './features/business/home-visits/home-visits.page';
 import { HoursPageComponent } from './features/business/hours/hours.page';
 import { ServicesPageComponent } from './features/business/services/services.page';
+import { StatsPageComponent } from './features/business/stats/stats.page';
 import { SettingsPageComponent } from './features/business/settings/settings.page';
 import { LoginPageComponent } from './features/auth/login/login.page';
 import { RegisterPageComponent } from './features/auth/register/register.page';
@@ -86,6 +87,11 @@ export const routes: Routes = [
 				path: 'appointments',
 				canActivate: [businessInfoGuard],
 				component: AppointmentsPageComponent
+			},
+			{
+				path: 'stats',
+				canActivate: [businessInfoGuard],
+				component: StatsPageComponent
 			},
 			{
 				path: 'services',

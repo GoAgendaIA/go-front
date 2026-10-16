@@ -247,6 +247,8 @@ export interface Employment {
   business_onboarding_completed: boolean;
   business_onboarding_step: number;
   business_home_visits_enabled: boolean;
+  /** Ya vio el aviso de «Ahora podras tomar el control de tu negocio con el panel de estadisticas». */
+  stats_intro_seen?: boolean;
   name: string | null;
   role: 'owner' | 'staff';
   active: boolean;
@@ -706,4 +708,23 @@ export interface CancelAppointmentResponse {
   aviso_cliente: CancellationNotice;
   /** La cita ya tenia un abono pagado: hay que coordinar la devolucion con el cliente. */
   tiene_pago: boolean;
+}
+
+
+/** Respuesta de GET /business-stats: lo que el dueño ve de su propio negocio (sin datos internos de la plataforma). */
+export interface BusinessStatsResponse {
+  periodo: { desde: string; hasta: string; anterior: { desde: string; hasta: string } | null; agrupado_por: MetricsGroupBy };
+  generado_en: string;
+  tarjetas: { citas_creadas: number; clientes_unicos: number; citas_ia: number; citas_manuales: number };
+  clientes: MetricsResponse['clientes'];
+  citas: MetricsResponse['citas'];
+  asistente: {
+    porcentaje_citas_ia: number | null;
+    por_origen: MetricsResponse['ia']['por_origen'];
+    canceladas_por_ia: number;
+    reprogramadas_por_ia: number;
+    conversaciones: MetricsResponse['ia']['conversaciones'];
+  };
+  rendimiento: MetricsResponse['rendimiento'];
+  comparacion: Partial<Record<'citas_creadas' | 'clientes_unicos' | 'citas_ia' | 'citas_manuales' | 'tasa_cancelacion' | 'conversion', MetricsComparisonItem>> | null;
 }
