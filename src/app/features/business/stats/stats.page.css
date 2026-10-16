@@ -1,0 +1,249 @@
+.page {
+  display: grid;
+  gap: 1rem;
+  padding-bottom: 5rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: var(--go-navy);
+  font-size: 1.5rem;
+}
+
+.page-header p {
+  margin: 0.2rem 0 0;
+  color: color-mix(in srgb, var(--go-dark) 60%, white);
+}
+
+.period-chips {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+}
+
+.chip {
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--go-dark) 15%, white);
+  background: #fff;
+  color: var(--go-dark);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip.active {
+  background: var(--go-teal);
+  border-color: var(--go-teal);
+  color: #fff;
+}
+
+.error-banner {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in srgb, #bd2e2e 28%, white);
+  background: color-mix(in srgb, #bd2e2e 8%, white);
+  color: #7f2121;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.88rem;
+}
+
+.retry {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hint {
+  margin: 0;
+  color: color-mix(in srgb, var(--go-dark) 55%, white);
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.kpi {
+  display: grid;
+  gap: 0.25rem;
+  align-content: start;
+  background: #fff;
+  border-radius: 1.1rem;
+  padding: 0.95rem 1rem;
+  box-shadow: 0 2px 8px rgb(16 32 64 / 8%);
+}
+
+.kpi-label {
+  color: color-mix(in srgb, var(--go-dark) 62%, white);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.kpi-value {
+  color: var(--go-navy);
+  font-size: 1.4rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.kpi-delta {
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.kpi-help {
+  color: color-mix(in srgb, var(--go-dark) 50%, white);
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+
+.tone-up {
+  color: #1f7a4d;
+}
+
+.tone-down {
+  color: #bd2e2e;
+}
+
+.tone-flat,
+.tone-none {
+  color: color-mix(in srgb, var(--go-dark) 50%, white);
+}
+
+.card {
+  display: grid;
+  gap: 0.8rem;
+  background: #fff;
+  border-radius: 1.2rem;
+  padding: 1.1rem;
+  box-shadow: 0 2px 8px rgb(16 32 64 / 8%);
+}
+
+.card h2 {
+  margin: 0;
+  color: var(--go-navy);
+  font-size: 1.1rem;
+}
+
+.card h3 {
+  margin: 0.2rem 0 0;
+  color: color-mix(in srgb, var(--go-dark) 70%, white);
+  font-size: 0.9rem;
+}
+
+.card.empty p {
+  margin: 0;
+  color: color-mix(in srgb, var(--go-dark) 60%, white);
+}
+
+.highlight {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--go-teal) 10%, white);
+  color: color-mix(in srgb, var(--go-teal) 55%, black);
+}
+
+.highlight strong {
+  font-size: 1.6rem;
+  white-space: nowrap;
+}
+
+.highlight span {
+  font-size: 0.88rem;
+}
+
+.facts {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.facts div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.8rem;
+}
+
+.facts dt {
+  color: color-mix(in srgb, var(--go-dark) 62%, white);
+  font-size: 0.9rem;
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--go-navy);
+  font-weight: 700;
+  text-align: right;
+}
+
+.facts small {
+  display: block;
+  font-weight: 500;
+  font-size: 0.76rem;
+}
+
+.insight {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--go-dark);
+}
+
+.bars {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bar-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--go-dark);
+}
+
+.bar-track {
+  height: 0.55rem;
+  margin-top: 0.3rem;
+  border-radius: 999px;
+  background: var(--go-bg);
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--go-teal);
+}
+
+.note,
+.footnote {
+  margin: 0;
+  color: color-mix(in srgb, var(--go-dark) 52%, white);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+@media (min-width: 720px) {
+  .kpis {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

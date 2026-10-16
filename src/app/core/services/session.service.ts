@@ -29,6 +29,8 @@ export class SessionService {
   readonly onboardingCompleted = computed(() => this.currentEmployment()?.business_onboarding_completed ?? true);
   // Flag por negocio: con los domicilios desactivados la app se comporta como antes.
   readonly homeVisitsEnabled = computed(() => this.currentEmployment()?.business_home_visits_enabled ?? false);
+  // Default true: sin el dato (backend anterior) el aviso simplemente no se muestra.
+  readonly statsIntroSeen = computed(() => this.currentEmployment()?.stats_intro_seen ?? true);
   readonly onboardingStep = computed(() => this.currentEmployment()?.business_onboarding_step ?? 1);
 
   get token(): string | null {
@@ -48,6 +50,20 @@ export class SessionService {
             ...me,
             employments: me.employments.map((e) =>
               e.business_id === this.businessId() ? { ...e, business_home_visits_enabled: enabled } : e
+            )
+          }
+        : me
+    );
+  }
+
+  /** Refleja en la sesion que el aviso de estadisticas ya se vio, para que no reaparezca sin volver a pedir /me. */
+  setStatsIntroSeen(): void {
+    this.me.update((me) =>
+      me
+        ? {
+            ...me,
+            employments: me.employments.map((e) =>
+              e.business_id === this.businessId() ? { ...e, stats_intro_seen: true } : e
             )
           }
         : me
