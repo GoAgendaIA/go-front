@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppointmentStatus } from '../../../core/models/appointment.model';
 import { CopCurrencyPipe } from '../../pipes/cop-currency.pipe';
 
@@ -52,9 +52,17 @@ export class AppointmentCardComponent {
   @Input() employeeName = '';
   @Input() isPast = false;
   @Input() highlighted = false;
+  /** Muestra el boton «Cancelar cita» (solo aplica si la cita aun puede cancelarse). */
+  @Input() cancellable = false;
+  @Output() readonly cancelRequested = new EventEmitter<void>();
 
   get state(): AppointmentVisualState {
     return appointmentVisualState(this.status, this.isPast);
+  }
+
+  /** Una cita cancelada o ya completada no se puede volver a cancelar. */
+  get canCancel(): boolean {
+    return this.cancellable && (this.state === 'confirmed' || this.state === 'pending');
   }
 
   get label(): string {

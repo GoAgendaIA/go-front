@@ -46,6 +46,10 @@
         }
       </p>
     }
+
+    @if (canCancel) {
+      <button type="button" class="cancel-btn" (click)="cancelRequested.emit()">Cancelar cita</button>
+    }
   </div>
 
   <span class="pill">{{ label }}</span>

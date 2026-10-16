@@ -68,4 +68,41 @@ describe('AppointmentCardComponent', () => {
     const el = crear({ status: 'confirmed' });
     expect(el.querySelector('.details')).toBeNull();
   });
+
+  describe('cancelar', () => {
+    const boton = (el: HTMLElement) => el.querySelector('.cancel-btn') as HTMLButtonElement | null;
+
+    it('una cita por venir muestra «Cancelar cita» y avisa al hacer clic', () => {
+      TestBed.configureTestingModule({});
+      const fixture = TestBed.createComponent(AppointmentCardComponent);
+      fixture.componentRef.setInput('clientName', 'Frank');
+      fixture.componentRef.setInput('serviceName', 'Corte');
+      fixture.componentRef.setInput('status', 'confirmed');
+      fixture.componentRef.setInput('cancellable', true);
+      fixture.detectChanges();
+
+      let pedidos = 0;
+      fixture.componentInstance.cancelRequested.subscribe(() => pedidos++);
+      const el = fixture.nativeElement as HTMLElement;
+      expect(boton(el)?.textContent?.trim()).toBe('Cancelar cita');
+      boton(el)?.click();
+      expect(pedidos).toBe(1);
+    });
+
+    it('no se ofrece en una cita cancelada, completada o pasada', () => {
+      for (const [status, isPast] of [['cancelled', false], ['completed', false], ['confirmed', true]] as const) {
+        const el = crear({ status, isPast, cancellable: true });
+        expect(boton(el)).toBeNull();
+        TestBed.resetTestingModule();
+      }
+    });
+
+    it('sin cancellable no hay boton', () => {
+      expect(boton(crear({ status: 'confirmed' }))).toBeNull();
+    });
+
+    it('una cita con pago pendiente si se puede cancelar', () => {
+      expect(boton(crear({ status: 'pending_payment', cancellable: true }))).not.toBeNull();
+    });
+  });
 });
