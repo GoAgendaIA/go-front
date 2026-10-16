@@ -617,6 +617,8 @@ export interface MetricsBusinessRow {
   tasa_cancelacion: number | null;
   conversion: number | null;
   costo_ia_usd: number;
+  /** Costo promedio de IA por cita agendada por la IA, en pesos. Null si no hubo citas de IA. */
+  costo_por_cita_ia_cop?: number | null;
   dias_hasta_primera_cita: number | null;
   citas_por_semana: number[];
   alertas: MetricsAlert[];
@@ -672,6 +674,12 @@ export interface MetricsResponse {
     };
     costo_usd: number;
     costo_por_cita_ia_usd: number | null;
+    /** Costo total de IA del periodo en pesos (con la tasa configurada en el backend). */
+    costo_cop?: number;
+    /** Costo de IA del periodo ÷ citas agendadas por la IA, en pesos. Null si no hubo citas de IA. */
+    costo_por_cita_ia_cop?: number | null;
+    /** Pesos por dolar usados en la conversion (se informa para poder auditar el calculo). */
+    tasa_cop_por_usd?: number;
   };
   rendimiento: {
     servicios_mas_agendados: { service_id: string; nombre: string; total: number; porcentaje: number | null }[];
@@ -689,7 +697,8 @@ export interface MetricsResponse {
   comparacion?: Record<
     'citas_creadas' | 'clientes_unicos' | 'citas_ia' | 'citas_manuales' | 'tasa_cancelacion' | 'conversion' | 'costo_ia_usd',
     MetricsComparisonItem
-  >;
+  > &
+    Partial<Record<'costo_por_cita_ia_cop', MetricsComparisonItem>>;
   /** Solo en el panel global. */
   adopcion?: MetricsAdoption;
   negocios?: MetricsBusinessRow[];

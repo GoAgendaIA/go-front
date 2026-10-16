@@ -20,6 +20,8 @@ import { formatHourLabel } from '../../../shared/utils/date-utils';
 
 type PeriodPreset = '7' | '30' | '90' | 'custom';
 
+const COP_FORMAT = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+
 const COLOR_IA = '#03a580';
 const COLOR_MANUAL = '#1d293d';
 const COLOR_OTHER = '#9aa7b8';
@@ -328,6 +330,14 @@ export class AnalyticsPageComponent implements OnInit {
 
   percent(value: number | null | undefined): string {
     return value === null || value === undefined ? '—' : `${value}%`;
+  }
+
+  /** Pesos colombianos sin decimales: $ 1.250. Null/undefined -> guion. */
+  cop(value: number | null | undefined): string {
+    if (value === null || value === undefined) {
+      return '—';
+    }
+    return COP_FORMAT.format(value);
   }
 
   usd(value: number | null | undefined): string {
