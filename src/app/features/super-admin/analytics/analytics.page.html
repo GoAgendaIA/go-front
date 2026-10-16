@@ -125,6 +125,43 @@
           </p>
         }
 
+
+        <!-- Costo promedio de IA por cita (COP) -->
+        <section class="cost-card" aria-label="Costo promedio de IA por cita">
+          <div class="cost-main">
+            <span class="cost-label">Costo promedio de IA por cita</span>
+            <strong class="cost-value">{{ cop(d.ia.costo_por_cita_ia_cop) }}</strong>
+            @if (d.ia.costo_por_cita_ia_cop === null || d.ia.costo_por_cita_ia_cop === undefined) {
+              <span class="cost-sub">Sin citas agendadas por la IA en este periodo.</span>
+            } @else {
+              <span class="cost-sub">por cita agendada por la IA</span>
+              @if (delta(d.comparacion?.costo_por_cita_ia_cop, true); as c) {
+                <span [class]="'delta ' + c.tone">{{ c.text }} vs. periodo anterior</span>
+              }
+            }
+          </div>
+          <dl class="cost-calc">
+            <div>
+              <dt>Costo total de IA</dt>
+              <dd>{{ cop(d.ia.costo_cop) }} <small>({{ usd(d.ia.costo_usd) }})</small></dd>
+            </div>
+            <div>
+              <dt>Citas agendadas por la IA</dt>
+              <dd>{{ d.tarjetas.citas_ia }}</dd>
+            </div>
+            @if (d.ia.tasa_cop_por_usd) {
+              <div>
+                <dt>Tasa usada</dt>
+                <dd>1 US$ = {{ cop(d.ia.tasa_cop_por_usd) }}</dd>
+              </div>
+            }
+          </dl>
+          <p class="cost-note">
+            Costo total de IA del periodo ÷ citas agendadas por la IA. La tasa de cambio se configura en el servidor
+            (<code>COP_POR_USD</code>); actualízala cuando cambie la TRM.
+          </p>
+        </section>
+
         <!-- Evolucion + origen -->
         <div class="grid two">
           <section class="card">
@@ -198,7 +235,7 @@
               <div><dt>Canceladas por la IA</dt><dd>{{ d.ia.canceladas_por_ia }}</dd></div>
               <div><dt>Reprogramadas por la IA</dt><dd>{{ d.ia.reprogramadas_por_ia }}</dd></div>
               <div><dt>Costo de IA</dt><dd>{{ usd(d.ia.costo_usd) }}</dd></div>
-              <div><dt>Costo por cita de IA</dt><dd>{{ usd(d.ia.costo_por_cita_ia_usd) }}</dd></div>
+              <div><dt>Costo por cita de IA</dt><dd>{{ cop(d.ia.costo_por_cita_ia_cop) }} <small>({{ usd(d.ia.costo_por_cita_ia_usd) }})</small></dd></div>
             </dl>
           </section>
         </div>
@@ -350,6 +387,7 @@
                     <th class="num">Cancel.</th>
                     <th class="num">Conversion</th>
                     <th class="num">Costo IA</th>
+                    <th class="num">Costo / cita IA</th>
                     <th class="num">Esta semana</th>
                     <th>Ultima actividad</th>
                   </tr>
@@ -372,11 +410,12 @@
                       <td class="num">{{ percent(row.tasa_cancelacion) }}</td>
                       <td class="num">{{ percent(row.conversion) }}</td>
                       <td class="num">{{ usd(row.costo_ia_usd) }}</td>
+                      <td class="num">{{ cop(row.costo_por_cita_ia_cop) }}</td>
                       <td class="num">{{ weekTotal(row) }}</td>
                       <td>{{ row.ultima_actividad ? (row.ultima_actividad | date: 'dd/MM/yy') : '—' }}</td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="9" class="empty">Todavia no hay negocios registrados.</td></tr>
+                    <tr><td colspan="10" class="empty">Todavia no hay negocios registrados.</td></tr>
                   }
                 </tbody>
               </table>
