@@ -1,0 +1,52 @@
+<article class="card" [class]="'state-' + state" [class.highlighted]="highlighted">
+  <span class="icon" aria-hidden="true">
+    @switch (state) {
+      @case ('completed') {
+        <svg viewBox="0 0 24 24" class="glyph" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.5l4.5 4.5L19 7" />
+        </svg>
+        <span class="icon-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="7.5" stroke-dasharray="3 2.4" />
+            <path d="M12 8.5V12l2.4 1.6" />
+          </svg>
+        </span>
+      }
+      @case ('cancelled') {
+        <svg viewBox="0 0 24 24" class="glyph" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      }
+      @default {
+        <svg viewBox="0 0 24 24" class="glyph" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5.2l3.2 1.9" />
+        </svg>
+      }
+    }
+  </span>
+
+  <div class="body">
+    <h3 class="client">{{ clientName }}</h3>
+    <p class="service">{{ serviceName }}</p>
+
+    @if (time || price !== null || phone || employeeName) {
+      <p class="details">
+        @if (time) {
+          <span>{{ time }}</span>
+        }
+        @if (price !== null) {
+          <span>{{ price | copCurrency }}</span>
+        }
+        @if (phone) {
+          <span>{{ phone }}</span>
+        }
+        @if (employeeName) {
+          <span>{{ employeeName }}</span>
+        }
+      </p>
+    }
+  </div>
+
+  <span class="pill">{{ label }}</span>
+</article>

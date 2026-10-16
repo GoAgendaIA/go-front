@@ -4,8 +4,8 @@ import { AppointmentStatus } from '../../../core/models/appointment.model';
 import { GoagendaApiService } from '../../../core/services/goagenda-api.service';
 import { RealtimeService } from '../../../core/services/realtime.service';
 import { SessionService } from '../../../core/services/session.service';
+import { AppointmentCardComponent } from '../../../shared/components/appointment-card/appointment-card.component';
 import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
-import { CopCurrencyPipe } from '../../../shared/pipes/cop-currency.pipe';
 import {
   formatFullDate,
   formatMonthYear,
@@ -28,17 +28,9 @@ interface AppointmentView {
   scheduledAt: Date;
 }
 
-const STATUS_LABELS: Record<AppointmentStatus, string> = {
-  pending: 'Pendiente',
-  pending_payment: 'Pago pendiente',
-  confirmed: 'Confirmada',
-  completed: 'Completada',
-  cancelled: 'Cancelada'
-};
-
 @Component({
   selector: 'app-my-appointments-page',
-  imports: [LucideIconComponent, CopCurrencyPipe],
+  imports: [AppointmentCardComponent, LucideIconComponent],
   templateUrl: './my-appointments.page.html',
   styleUrl: './my-appointments.page.css'
 })
@@ -122,10 +114,6 @@ export class MyAppointmentsPageComponent implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  statusLabel(status: AppointmentStatus): string {
-    return STATUS_LABELS[status];
   }
 
   /** Ya paso la hora de esta cita - se pinta atenuada en el calendario. */

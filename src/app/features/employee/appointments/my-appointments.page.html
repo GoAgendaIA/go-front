@@ -56,41 +56,15 @@
     } @else {
       <div class="appointment-list">
         @for (appointment of appointmentsForSelectedDay(); track appointment.id) {
-          <article class="appointment-card" [class]="'status-' + appointment.status" [class.past]="isPastAppointment(appointment)">
-            <span class="appointment-icon">
-              <app-lucide-icon name="clock" [size]="20" [strokeWidth]="1.9" />
-            </span>
-
-            <div class="appointment-body">
-              <div class="appointment-top">
-                <div class="appointment-info">
-                  <h3>{{ appointment.clientName }}</h3>
-                  <p class="appointment-service">{{ appointment.serviceName }}</p>
-                </div>
-                <span class="status-badge" [class]="'status-badge-' + appointment.status">
-                  {{ statusLabel(appointment.status) }}
-                </span>
-                @if (isPastAppointment(appointment)) {
-                  <span class="past-badge">Ya pasó</span>
-                }
-              </div>
-
-              <div class="appointment-bottom">
-                <span class="appointment-time">
-                  <app-lucide-icon name="clock" [size]="15" [strokeWidth]="2" />
-                  {{ appointment.time }}
-                </span>
-                <span class="appointment-price">{{ appointment.price | copCurrency }}</span>
-              </div>
-
-              @if (appointment.clientPhone) {
-                <span class="appointment-phone">
-                  <app-lucide-icon name="phone" [size]="15" [strokeWidth]="2" />
-                  {{ appointment.clientPhone }}
-                </span>
-              }
-            </div>
-          </article>
+          <app-appointment-card
+            [clientName]="appointment.clientName"
+            [serviceName]="appointment.serviceName"
+            [status]="appointment.status"
+            [time]="appointment.time"
+            [price]="appointment.price"
+            [phone]="appointment.clientPhone"
+            [isPast]="isPastAppointment(appointment)"
+          />
         }
       </div>
     }
