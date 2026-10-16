@@ -186,7 +186,7 @@
           } @else {
             <option value="" disabled>Selecciona una hora</option>
             @for (slot of availableSlots(); track slot) {
-              <option [value]="slot">{{ slot }}</option>
+              <option [value]="slot">{{ slot | time12h }}</option>
             }
           }
         </select>
@@ -235,7 +235,7 @@
         @if (availabilitySlots().length > 0) {
           <div class="availability-results">
             @for (slot of availabilitySlots(); track slot) {
-              <span class="availability-chip">{{ slot }}</span>
+              <span class="availability-chip">{{ slot | time12h }}</span>
             }
           </div>
         } @else if (availabilityForm.controls.employee_id.value) {

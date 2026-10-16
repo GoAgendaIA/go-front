@@ -16,6 +16,7 @@ import { UiButtonComponent } from '../../../shared/components/ui-button/ui-butto
 import { UiModalComponent } from '../../../shared/components/ui-modal/ui-modal.component';
 import { UiTextFieldComponent } from '../../../shared/components/ui-text-field/ui-text-field.component';
 import { CopCurrencyPipe } from '../../../shared/pipes/cop-currency.pipe';
+import { Time12hPipe } from '../../../shared/pipes/time12h.pipe';
 import {
   formatFullDate,
   formatMonthYear,
@@ -49,7 +50,8 @@ interface AppointmentView {
     UiButtonComponent,
     UiModalComponent,
     UiTextFieldComponent,
-    CopCurrencyPipe
+    CopCurrencyPipe,
+    Time12hPipe
   ],
   templateUrl: './appointments.page.html',
   styleUrl: './appointments.page.css'
