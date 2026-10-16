@@ -15,6 +15,8 @@
   border-radius: 1.4rem;
   /* La franja de color sigue la curva de la esquina, como en el diseño. */
   border-left: 0.4rem solid var(--accent);
+  /* Sombra sutil: separa la tarjeta del fondo sin recargarla. */
+  box-shadow: 0 2px 8px rgb(16 32 64 / 8%);
 }
 
 .state-completed {
@@ -137,12 +139,12 @@
 @keyframes highlight-pulse {
   0%,
   35% {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 55%, white);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 55%, white), 0 2px 8px rgb(16 32 64 / 8%);
     background: color-mix(in srgb, var(--accent) 12%, white);
   }
 
   100% {
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgb(16 32 64 / 8%);
     background: #f8f8f8;
   }
 }
