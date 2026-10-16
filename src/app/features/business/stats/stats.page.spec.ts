@@ -124,7 +124,8 @@ describe('StatsPageComponent', () => {
   it('compara con el periodo anterior: subir cancelaciones se marca como malo', async () => {
     const { component } = montar();
     expect(component.delta(DATOS.comparacion?.citas_creadas)).toEqual({
-      text: '+20 % frente al periodo anterior',
+      value: '▲ +20 %',
+      caption: 'vs. periodo anterior',
       tone: 'up'
     });
     expect(component.delta(DATOS.comparacion?.tasa_cancelacion, true).tone).toBe('down');

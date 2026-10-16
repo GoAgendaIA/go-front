@@ -3,12 +3,15 @@ import { firstValueFrom } from 'rxjs';
 import { BusinessStatsResponse, MetricsComparisonItem, MetricsOrigin } from '../../../core/models/goagenda.models';
 import { GoagendaApiService } from '../../../core/services/goagenda-api.service';
 import { SessionService } from '../../../core/services/session.service';
+import { LucideIconComponent } from '../../../shared/components/lucide-icon/lucide-icon.component';
 import { BarChartComponent, BarChartSeries } from '../../../shared/components/bar-chart/bar-chart.component';
 import { DonutChartComponent, DonutSlice } from '../../../shared/components/donut-chart/donut-chart.component';
 import { CopCurrencyPipe } from '../../../shared/pipes/cop-currency.pipe';
 import { formatHourLabel } from '../../../shared/utils/date-utils';
 
 export type StatsPeriod = '7' | '30' | 'month' | 'last-month';
+
+const MESES_CORTOS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
 const COLOR_PRINCIPAL = '#03a580';
 const COLOR_SECUNDARIO = '#1d293d';
@@ -17,7 +20,7 @@ const ORIGIN_LABEL: Record<MetricsOrigin, string> = {
   ai: 'Asistente de GoAgenda',
   manual: 'Agendadas por ti',
   web: 'Web',
-  unknown: 'Otras'
+  unknown: 'Sin clasificar'
 };
 const ORIGIN_COLOR: Record<MetricsOrigin, string> = {
   ai: COLOR_PRINCIPAL,
@@ -56,7 +59,7 @@ export function periodRange(period: StatsPeriod, today: Date = new Date()): { de
 
 @Component({
   selector: 'app-stats-page',
-  imports: [BarChartComponent, DonutChartComponent, CopCurrencyPipe],
+  imports: [BarChartComponent, DonutChartComponent, LucideIconComponent, CopCurrencyPipe],
   templateUrl: './stats.page.html',
   styleUrl: './stats.page.css'
 })
@@ -70,6 +73,36 @@ export class StatsPageComponent implements OnInit {
   readonly isLoading = signal(false);
   readonly error = signal('');
 
+  /** «16 sep – 15 oct 2026»: el periodo que se esta viendo, para que no haya duda. */
+  readonly periodCaption = computed(() => {
+    const periodo = this.data()?.periodo;
+    if (!periodo) {
+      return '';
+    }
+    const corto = (iso: string) => {
+      const [, mes, dia] = iso.split('-').map(Number);
+      return `${dia} ${MESES_CORTOS[mes - 1]}`;
+    };
+    return `${corto(periodo.desde)} – ${corto(periodo.hasta)} ${periodo.hasta.slice(0, 4)}`;
+  });
+
+  /** Embudo del asistente: de las conversaciones atendidas, cuantas terminaron en cita o pasaron a una persona. */
+  readonly funnelRows = computed(() => {
+    const convs = this.data()?.asistente.conversaciones;
+    if (!convs) {
+      return [];
+    }
+    const max = Math.max(1, convs.iniciadas);
+    return [
+      { label: 'Conversaciones atendidas', value: convs.iniciadas, width: 100, color: COLOR_SECUNDARIO },
+      { label: 'Terminaron en una cita', value: convs.con_cita, width: (convs.con_cita / max) * 100, color: COLOR_PRINCIPAL },
+      { label: 'Pasaron a una persona', value: convs.transferidas_a_humano, width: (convs.transferidas_a_humano / max) * 100, color: '#e0a526' }
+    ];
+  });
+
+  /** Las citas anteriores al seguimiento de origen no se pueden clasificar: se avisa para no confundir el porcentaje. */
+  readonly hasUnclassified = computed(() => (this.data()?.asistente.por_origen.unknown?.total ?? 0) > 0);
+
   readonly hasActivity = computed(() => (this.data()?.tarjetas.citas_creadas ?? 0) > 0);
 
   readonly originSlices = computed<DonutSlice[]>(() => {
@@ -82,7 +115,10 @@ export class StatsPageComponent implements OnInit {
       .filter((slice) => slice.value > 0);
   });
 
-  readonly evolutionLabels = computed(() => (this.data()?.citas.evolucion ?? []).map((p) => p.periodo.slice(5)));
+  readonly evolutionLabels = computed(() => (this.data()?.citas.evolucion ?? []).map((p) => {
+      const [, mes, dia] = p.periodo.split('-').map(Number);
+      return `${dia} ${MESES_CORTOS[mes - 1]}`;
+    }));
   readonly evolutionSeries = computed<BarChartSeries[]>(() => [
     { name: 'Citas', color: COLOR_PRINCIPAL, values: (this.data()?.citas.evolucion ?? []).map((p) => p.total) }
   ]);
@@ -143,7 +179,7 @@ export class StatsPageComponent implements OnInit {
           this.apiService.getBusinessStats(businessId, {
             desde,
             hasta,
-            group_by: this.period() === '7' ? 'day' : 'day',
+            group_by: 'day',
             comparar: true,
             refrescar: refresh
           })
@@ -160,18 +196,24 @@ export class StatsPageComponent implements OnInit {
     return value === null || value === undefined ? '—' : `${String(value).replace('.', ',')} %`;
   }
 
-  /** «+12 % frente al periodo anterior» / «Igual» / «Sin datos del periodo anterior». */
-  delta(item: MetricsComparisonItem | undefined, inverse = false): { text: string; tone: 'up' | 'down' | 'flat' | 'none' } {
+  /**
+   * Variacion frente al periodo anterior: el valor («+12 %») va en el chip y la aclaracion («vs. periodo
+   * anterior») aparte, para que el chip nunca se parta en dos lineas.
+   */
+  delta(
+    item: MetricsComparisonItem | undefined,
+    inverse = false
+  ): { value: string; caption: string; tone: 'up' | 'down' | 'flat' | 'none' } {
     if (!item || item.variacion_pct === null || item.variacion_pct === undefined) {
-      return { text: 'Sin datos del periodo anterior', tone: 'none' };
+      return { value: '', caption: 'Sin datos del periodo anterior', tone: 'none' };
     }
     if (item.variacion_pct === 0) {
-      return { text: 'Igual que el periodo anterior', tone: 'flat' };
+      return { value: 'Igual', caption: 'que el periodo anterior', tone: 'flat' };
     }
     const subio = item.variacion_pct > 0;
-    const texto = `${subio ? '+' : ''}${String(item.variacion_pct).replace('.', ',')} % frente al periodo anterior`;
+    const valor = `${subio ? '▲ +' : '▼ '}${String(item.variacion_pct).replace('.', ',')} %`;
     // En algunas metricas (cancelaciones) subir es malo.
     const bueno = inverse ? !subio : subio;
-    return { text: texto, tone: bueno ? 'up' : 'down' };
+    return { value: valor, caption: 'vs. periodo anterior', tone: bueno ? 'up' : 'down' };
   }
 }

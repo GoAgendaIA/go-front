@@ -1,15 +1,16 @@
-<section class="page">
-  <header class="page-header">
+<header class="page-header">
+  <div>
     <h1>Estadísticas</h1>
     <p>Así le está yendo a tu negocio con GoAgenda.</p>
-  </header>
+  </div>
+</header>
 
-  <div class="period-chips" role="tablist" aria-label="Periodo">
+<div class="toolbar">
+  <div class="segmented" role="tablist" aria-label="Periodo">
     @for (option of periods; track option.value) {
       <button
         type="button"
         role="tab"
-        class="chip"
         [class.active]="period() === option.value"
         [attr.aria-selected]="period() === option.value"
         (click)="selectPeriod(option.value)"
@@ -18,200 +19,292 @@
       </button>
     }
   </div>
+  @if (periodCaption()) {
+    <span class="caption">{{ periodCaption() }}</span>
+  }
+</div>
 
-  @if (error()) {
-    <p class="error-banner" role="alert">
-      {{ error() }}
-      <button type="button" class="retry" (click)="load(true)">Reintentar</button>
-    </p>
+@if (error()) {
+  <p class="error-banner" role="alert">
+    <span>{{ error() }}</span>
+    <button type="button" class="retry" (click)="load(true)">Reintentar</button>
+  </p>
+}
+
+@if (isLoading() && !data()) {
+  <div class="skeletons" aria-hidden="true">
+    @for (n of [1, 2, 3, 4]; track n) {
+      <div class="skeleton"></div>
+    }
+  </div>
+} @else if (data(); as d) {
+  @if (!hasActivity()) {
+    <section class="card empty">
+      <app-lucide-icon name="chart-column" [size]="30" [strokeWidth]="1.8" />
+      <h2>Aún no hay citas en este periodo</h2>
+      <p>Cuando tengas citas agendadas, aquí verás cuántas son, cuánto generan y en qué horarios tienes más demanda.</p>
+    </section>
   }
 
-  @if (isLoading() && !data()) {
-    <p class="hint">Cargando estadísticas...</p>
-  } @else if (data(); as d) {
-    @if (!hasActivity()) {
-      <article class="card empty">
-        <h2>Aún no hay citas en este periodo</h2>
-        <p>Cuando tengas citas agendadas, aquí verás cuántas son, cuánto generan y en qué horarios tienes más demanda.</p>
-      </article>
-    }
-
-    <div class="kpis">
-      <article class="kpi">
+  <section class="kpis" [class.is-loading]="isLoading()">
+    <article class="kpi">
+      <div class="kpi-top">
+        <span class="badge badge-teal"><app-lucide-icon name="calendar" [size]="18" [strokeWidth]="2" /></span>
         <span class="kpi-label">Citas agendadas</span>
-        <strong class="kpi-value">{{ d.tarjetas.citas_creadas }}</strong>
-        @if (delta(d.comparacion?.citas_creadas); as v) {
-          <span class="kpi-delta" [class]="'tone-' + v.tone">{{ v.text }}</span>
-        }
-        <span class="kpi-help">Citas que se crearon en este periodo, por el asistente o por ti.</span>
-      </article>
-
-      <article class="kpi">
-        <span class="kpi-label">Clientes distintos</span>
-        <strong class="kpi-value">{{ d.tarjetas.clientes_unicos }}</strong>
-        @if (delta(d.comparacion?.clientes_unicos); as v) {
-          <span class="kpi-delta" [class]="'tone-' + v.tone">{{ v.text }}</span>
-        }
-        <span class="kpi-help">Personas diferentes que agendaron contigo.</span>
-      </article>
-
-      <article class="kpi">
-        <span class="kpi-label">Ingresos estimados</span>
-        <strong class="kpi-value">{{ d.rendimiento.ingresos_estimados.completadas | copCurrency }}</strong>
-        <span class="kpi-help">De las citas del periodo que ya ocurrieron y no se cancelaron.</span>
-      </article>
-
-      <article class="kpi">
-        <span class="kpi-label">Por realizar</span>
-        <strong class="kpi-value">{{ d.rendimiento.ingresos_estimados.por_realizar | copCurrency }}</strong>
-        @if (d.rendimiento.ingresos_estimados.citas_por_realizar !== undefined) {
-          <span class="kpi-delta tone-none">
-            {{ d.rendimiento.ingresos_estimados.citas_por_realizar }}
-            {{ d.rendimiento.ingresos_estimados.citas_por_realizar === 1 ? 'cita futura' : 'citas futuras' }}
-          </span>
-        }
-        <span class="kpi-help">Lo que ya tienes agendado de hoy en adelante, sin importar el periodo.</span>
-      </article>
-    </div>
-
-    <article class="card">
-      <h2>Lo que aporta GoAgenda</h2>
-      <div class="highlight">
-        <strong>{{ percent(d.asistente.porcentaje_citas_ia) }}</strong>
-        <span>de tus citas las agendó el asistente por ti, sin que tuvieras que atender el mensaje.</span>
       </div>
-      <dl class="facts">
-        <div>
-          <dt>Conversaciones atendidas</dt>
-          <dd>{{ d.asistente.conversaciones.iniciadas }}</dd>
+      <strong class="kpi-value">{{ d.tarjetas.citas_creadas }}</strong>
+      @if (delta(d.comparacion?.citas_creadas); as v) {
+        <div class="delta-row">
+          @if (v.value) {
+            <span class="delta" [class]="'tone-' + v.tone">{{ v.value }}</span>
+          }
+          <span class="delta-caption">{{ v.caption }}</span>
         </div>
-        <div>
-          <dt>Terminaron en una cita</dt>
-          <dd>
-            {{ d.asistente.conversaciones.con_cita }}
-            @if (d.asistente.conversaciones.conversion !== null) {
-              <small>({{ percent(d.asistente.conversaciones.conversion) }})</small>
-            }
-          </dd>
-        </div>
-        <div>
-          <dt>Pasaron a una persona</dt>
-          <dd>{{ d.asistente.conversaciones.transferidas_a_humano }}</dd>
-        </div>
-      </dl>
-      @if (originSlices().length > 0) {
-        <app-donut-chart [slices]="originSlices()" centerLabel="citas" ariaLabel="Origen de las citas" />
       }
-      <p class="note">
-        «Terminaron en una cita» es el porcentaje de conversaciones en las que el cliente terminó agendando.
-      </p>
+      <p class="kpi-help">Las que se crearon en este periodo, por el asistente o por ti.</p>
     </article>
 
-    <article class="card">
-      <h2>Citas en el tiempo</h2>
-      <app-bar-chart [labels]="evolutionLabels()" [series]="evolutionSeries()" ariaLabel="Citas creadas por dia" />
-      <p class="note">Cada barra es un día. Te ayuda a ver en qué momentos se llena tu agenda.</p>
+    <article class="kpi">
+      <div class="kpi-top">
+        <span class="badge badge-blue"><app-lucide-icon name="users" [size]="18" [strokeWidth]="2" /></span>
+        <span class="kpi-label">Clientes distintos</span>
+      </div>
+      <strong class="kpi-value">{{ d.tarjetas.clientes_unicos }}</strong>
+      @if (delta(d.comparacion?.clientes_unicos); as v) {
+        <div class="delta-row">
+          @if (v.value) {
+            <span class="delta" [class]="'tone-' + v.tone">{{ v.value }}</span>
+          }
+          <span class="delta-caption">{{ v.caption }}</span>
+        </div>
+      }
+      <p class="kpi-help">Personas diferentes que agendaron contigo.</p>
     </article>
 
-    <article class="card">
-      <h2>Servicios más pedidos</h2>
-      @if (serviceRows().length === 0) {
-        <p class="hint">Todavía no hay datos de servicios en este periodo.</p>
-      } @else {
-        <ul class="bars">
-          @for (row of serviceRows(); track row.service_id) {
+    <article class="kpi kpi-wide">
+      <div class="kpi-top">
+        <span class="badge badge-navy"><app-lucide-icon name="credit-card" [size]="18" [strokeWidth]="2" /></span>
+        <span class="kpi-label">Ingresos estimados</span>
+      </div>
+      <strong class="kpi-value">{{ d.rendimiento.ingresos_estimados.completadas | copCurrency }}</strong>
+      <span class="delta tone-none">Citas que ya ocurrieron</span>
+      <p class="kpi-help">De las citas del periodo que no se cancelaron.</p>
+    </article>
+
+    <article class="kpi kpi-wide">
+      <div class="kpi-top">
+        <span class="badge badge-amber"><app-lucide-icon name="clock" [size]="18" [strokeWidth]="2" /></span>
+        <span class="kpi-label">Por realizar</span>
+      </div>
+      <strong class="kpi-value">{{ d.rendimiento.ingresos_estimados.por_realizar | copCurrency }}</strong>
+      @if (d.rendimiento.ingresos_estimados.citas_por_realizar !== undefined) {
+        <span class="delta tone-none">
+          {{ d.rendimiento.ingresos_estimados.citas_por_realizar }}
+          {{ d.rendimiento.ingresos_estimados.citas_por_realizar === 1 ? 'cita futura' : 'citas futuras' }}
+        </span>
+      }
+      <p class="kpi-help">Lo que ya tienes agendado de hoy en adelante.</p>
+    </article>
+  </section>
+
+  <section class="card">
+    <header class="card-head">
+      <span class="badge badge-teal"><app-lucide-icon name="message-circle" [size]="18" [strokeWidth]="2" /></span>
+      <div>
+        <h2>Lo que aporta GoAgenda</h2>
+        <p>Citas que el asistente agenda por ti, sin que atiendas cada mensaje.</p>
+      </div>
+    </header>
+
+    <div class="split">
+      <div class="stack">
+        <div class="hero">
+          <strong>{{ percent(d.asistente.porcentaje_citas_ia) }}</strong>
+          <span>de tus citas las agendó el asistente por ti.</span>
+        </div>
+
+        <ul class="funnel">
+          @for (row of funnelRows(); track row.label) {
             <li>
-              <div class="bar-head">
-                <span>{{ row.nombre }}</span>
-                <strong>{{ row.total }}</strong>
+              <div class="funnel-head">
+                <span>{{ row.label }}</span>
+                <strong>
+                  {{ row.value }}
+                  @if (row.label === 'Terminaron en una cita' && d.asistente.conversaciones.conversion !== null) {
+                    <small>{{ percent(d.asistente.conversaciones.conversion) }}</small>
+                  }
+                </strong>
               </div>
-              <div class="bar-track"><span class="bar-fill" [style.width.%]="row.width"></span></div>
+              <div class="track"><span class="fill" [style.width.%]="row.width" [style.background]="row.color"></span></div>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <div class="origin">
+        <h3>Origen de las citas</h3>
+        @if (originSlices().length > 0) {
+          <app-donut-chart [slices]="originSlices()" centerLabel="citas" ariaLabel="Origen de las citas" />
+        } @else {
+          <p class="muted">Todavía no hay citas para clasificar.</p>
+        }
+        @if (hasUnclassified()) {
+          <p class="note">
+            «Sin clasificar» son citas creadas antes de que GoAgenda registrara su origen, por eso el porcentaje del
+            asistente puede ser mayor en los próximos periodos.
+          </p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <header class="card-head">
+      <span class="badge badge-blue"><app-lucide-icon name="chart-column" [size]="18" [strokeWidth]="2" /></span>
+      <div>
+        <h2>Citas en el tiempo</h2>
+        <p>Cada barra es un día: te ayuda a ver cuándo se llena tu agenda.</p>
+      </div>
+    </header>
+    <app-bar-chart [labels]="evolutionLabels()" [series]="evolutionSeries()" ariaLabel="Citas creadas por dia" />
+  </section>
+
+  <div class="grid-2">
+    <section class="card">
+      <header class="card-head">
+        <span class="badge badge-teal"><app-lucide-icon name="scissors" [size]="18" [strokeWidth]="2" /></span>
+        <div>
+          <h2>Servicios más pedidos</h2>
+          <p>Sin contar las citas canceladas.</p>
+        </div>
+      </header>
+      @if (serviceRows().length === 0) {
+        <p class="muted">Todavía no hay datos de servicios en este periodo.</p>
+      } @else {
+        <ul class="ranking">
+          @for (row of serviceRows(); track row.service_id; let i = $index) {
+            <li>
+              <span class="rank">{{ i + 1 }}</span>
+              <div class="rank-body">
+                <div class="rank-head">
+                  <span class="rank-name">{{ row.nombre }}</span>
+                  <strong>{{ row.total }} <small>{{ row.total === 1 ? 'cita' : 'citas' }}</small></strong>
+                </div>
+                <div class="track"><span class="fill fill-teal" [style.width.%]="row.width"></span></div>
+              </div>
             </li>
           }
         </ul>
       }
-      <p class="note">Sin contar las citas canceladas. Úsalo para decidir qué servicios promocionar.</p>
-    </article>
+    </section>
 
-    <article class="card">
-      <h2>¿Cuándo tienes más demanda?</h2>
-      @if (busiestWeekday(); as top) {
-        <p class="insight">Tu día más fuerte es el <strong>{{ top.dia }}</strong> ({{ top.total }} citas).</p>
-      }
-      <h3>Por día de la semana</h3>
-      <app-bar-chart [labels]="weekdayLabels()" [series]="weekdaySeries()" ariaLabel="Citas por dia de la semana" />
-      <h3>Por hora del día</h3>
-      <app-bar-chart [labels]="hourLabels()" [series]="hourSeries()" ariaLabel="Citas por hora del dia" />
-      <p class="note">Sirve para reforzar el equipo en tus horas pico o para ofrecer promociones en las horas más flojas.</p>
-    </article>
-
-    <article class="card">
-      <h2>Tus clientes</h2>
-      <dl class="facts">
+    <section class="card">
+      <header class="card-head">
+        <span class="badge badge-amber"><app-lucide-icon name="user" [size]="18" [strokeWidth]="2" /></span>
         <div>
-          <dt>Clientes nuevos en el periodo</dt>
-          <dd>{{ d.clientes.nuevos_en_periodo }}</dd>
+          <h2>Tus clientes</h2>
+          <p>Quiénes vuelven y quiénes se están alejando.</p>
         </div>
-        <div>
-          <dt>Clientes recurrentes</dt>
-          <dd>{{ d.clientes.recurrentes }}</dd>
+      </header>
+      <div class="mini-stats">
+        <div class="mini">
+          <strong>{{ d.clientes.nuevos_en_periodo }}</strong>
+          <span>Nuevos en el periodo</span>
         </div>
-        <div>
-          <dt>Hace más de {{ d.clientes.sin_volver.dias }} días que no vuelven</dt>
-          <dd>{{ d.clientes.sin_volver.total }}</dd>
+        <div class="mini">
+          <strong>{{ d.clientes.recurrentes }}</strong>
+          <span>Recurrentes</span>
         </div>
-      </dl>
+        <div class="mini">
+          <strong>{{ d.clientes.sin_volver.total }}</strong>
+          <span>No vuelven hace {{ d.clientes.sin_volver.dias }}+ días</span>
+        </div>
+      </div>
       <p class="note">
-        Recurrente es quien ya agendó al menos dos veces. Los que no vuelven son buenos candidatos para escribirles.
+        Recurrente es quien ya agendó al menos dos veces. A quienes no vuelven vale la pena escribirles con una promoción.
       </p>
-    </article>
+    </section>
+  </div>
 
-    <article class="card">
-      <h2>Cancelaciones</h2>
-      <dl class="facts">
+  <section class="card">
+    <header class="card-head">
+      <span class="badge badge-navy"><app-lucide-icon name="clock" [size]="18" [strokeWidth]="2" /></span>
+      <div>
+        <h2>¿Cuándo tienes más demanda?</h2>
+        <p>Úsalo para reforzar tus horas pico o promocionar las más flojas.</p>
+      </div>
+    </header>
+    @if (busiestWeekday(); as top) {
+      <p class="insight">
+        Tu día más fuerte es el <strong>{{ top.dia }}</strong> ({{ top.total }} {{ top.total === 1 ? 'cita' : 'citas' }}).
+      </p>
+    }
+    <div class="split">
+      <div>
+        <h3>Por día de la semana</h3>
+        <app-bar-chart [labels]="weekdayLabels()" [series]="weekdaySeries()" ariaLabel="Citas por dia de la semana" />
+      </div>
+      <div>
+        <h3>Por hora del día</h3>
+        <app-bar-chart [labels]="hourLabels()" [series]="hourSeries()" ariaLabel="Citas por hora del dia" />
+      </div>
+    </div>
+  </section>
+
+  <div class="grid-2">
+    <section class="card">
+      <header class="card-head">
+        <span class="badge badge-red"><app-lucide-icon name="calendar-x" [size]="18" [strokeWidth]="2" /></span>
         <div>
-          <dt>Tasa de cancelación</dt>
-          <dd>
-            {{ percent(d.citas.tasa_cancelacion) }}
-            @if (delta(d.comparacion?.tasa_cancelacion, true); as v) {
-              <small [class]="'tone-' + v.tone">{{ v.text }}</small>
+          <h2>Cancelaciones</h2>
+          <p>Una tasa alta puede indicar horarios poco cómodos.</p>
+        </div>
+      </header>
+      <div class="mini-stats">
+        <div class="mini">
+          <strong>{{ percent(d.citas.tasa_cancelacion) }}</strong>
+          <span>Tasa de cancelación</span>
+          @if (delta(d.comparacion?.tasa_cancelacion, true); as v) {
+            @if (v.tone !== 'none') {
+              <small [class]="'tone-' + v.tone">{{ v.value }} {{ v.caption }}</small>
             }
-          </dd>
+          }
         </div>
-        <div>
-          <dt>Citas canceladas</dt>
-          <dd>{{ d.citas.por_estado.cancelled }}</dd>
+        <div class="mini">
+          <strong>{{ d.citas.por_estado.cancelled }}</strong>
+          <span>Canceladas</span>
         </div>
-        <div>
-          <dt>Citas reprogramadas</dt>
-          <dd>{{ d.citas.reprogramadas }}</dd>
+        <div class="mini">
+          <strong>{{ d.citas.reprogramadas }}</strong>
+          <span>Reprogramadas</span>
         </div>
-      </dl>
-      <p class="note">Una tasa alta puede indicar horarios poco cómodos para tus clientes.</p>
-    </article>
+      </div>
+    </section>
 
     @if (d.rendimiento.domicilios.total > 0) {
-      <article class="card">
-        <h2>Domicilios</h2>
-        <dl class="facts">
+      <section class="card">
+        <header class="card-head">
+          <span class="badge badge-teal"><app-lucide-icon name="map-pin" [size]="18" [strokeWidth]="2" /></span>
           <div>
-            <dt>Citas a domicilio</dt>
-            <dd>
-              {{ d.rendimiento.domicilios.total }}
-              <small>({{ percent(d.rendimiento.domicilios.porcentaje) }})</small>
-            </dd>
+            <h2>Domicilios</h2>
+            <p>Citas atendidas en la dirección del cliente.</p>
           </div>
-          <div>
-            <dt>Recargos cobrados</dt>
-            <dd>{{ d.rendimiento.ingresos_estimados.recargos_domicilio | copCurrency }}</dd>
+        </header>
+        <div class="mini-stats">
+          <div class="mini">
+            <strong>{{ d.rendimiento.domicilios.total }}</strong>
+            <span>Citas a domicilio ({{ percent(d.rendimiento.domicilios.porcentaje) }})</span>
           </div>
-        </dl>
-      </article>
+          <div class="mini">
+            <strong>{{ d.rendimiento.ingresos_estimados.recargos_domicilio | copCurrency }}</strong>
+            <span>Recargos cobrados</span>
+          </div>
+        </div>
+      </section>
     }
+  </div>
 
-    <p class="footnote">
-      Los ingresos usan el precio actual de cada servicio, no el valor realmente cobrado. Se actualizan cada pocos
-      minutos.
-    </p>
-  }
-</section>
+  <p class="footnote">
+    Los ingresos usan el precio actual de cada servicio, no el valor realmente cobrado, y se actualizan cada pocos minutos.
+  </p>
+}
