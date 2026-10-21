@@ -3,12 +3,16 @@ name: Build and Deploy
 on:
   push:
     branches: [main]
+  # Reconstruir y desplegar desde GitHub (Actions > Build and Deploy > Run workflow) sin hacer un
+  # commit. Solo despliega desde main (ver los `if` de los jobs).
+  workflow_dispatch:
 
 # El nombre de la imagen se calcula en minusculas en el job de build: Docker rechaza nombres con
 # mayusculas y la organizacion se llama "GoAgendaIA" (github.repository = "GoAgendaIA/...").
 
 jobs:
   build-and-push:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -43,6 +47,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
