@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
 
-env:
-  IMAGE_NAME: ghcr.io/${{ github.repository }}
+# El nombre de la imagen se calcula en minusculas en el job de build: Docker rechaza nombres con
+# mayusculas y la organizacion se llama "GoAgendaIA" (github.repository = "GoAgendaIA/...").
 
 jobs:
   build-and-push:
@@ -15,6 +15,9 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Nombre de la imagen (ghcr.io/<owner>/<repo> en minusculas)
+        run: echo "IMAGE_NAME=ghcr.io/$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
       - uses: docker/setup-qemu-action@v3
 
@@ -34,6 +37,8 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
