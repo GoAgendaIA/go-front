@@ -55,6 +55,27 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "pruebas": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.pruebas.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -62,7 +83,10 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "allowedHosts": [".ngrok-free.app", "de4e-190-60-37-94.ngrok-free.app"]
+            "allowedHosts": [
+              ".ngrok-free.app",
+              "de4e-190-60-37-94.ngrok-free.app"
+            ]
           },
           "configurations": {
             "production": {
