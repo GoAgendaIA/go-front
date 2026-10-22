@@ -1,0 +1,49 @@
+name: Production (Seenode)
+
+# Un push a `production` ejecuta compilacion y pruebas; solo si pasan, avanza la rama `release`.
+# Seenode vigila `release` (auto_deploy) y construye/despliega el sitio estatico desde ahi,
+# asi que un commit con pruebas rojas nunca llega a produccion.
+on:
+  push:
+    branches: [production]
+
+# Dos pushes seguidos no se pisan: se espera a que termine el anterior en vez de cancelarlo.
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar (produccion)
+        run: npx ng build
+
+      - name: Pruebas unitarias
+        run: npx ng test --watch=false
+
+  release:
+    needs: pruebas
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # `release` solo la mueve este workflow. --force-with-lease evita pisar un cambio hecho a mano.
+      - name: Avanzar release al commit probado
+        run: git push origin "$GITHUB_SHA:refs/heads/release" --force-with-lease
