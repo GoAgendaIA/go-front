@@ -46,6 +46,20 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # Misma imagen pero compilada con el environment de pruebas (API de pruebas y su Supabase). Se publica con el
+      # tag `pruebas`; el stack de pruebas del VPS (/opt/goagenda/pruebas) la usa y produccion sigue con `latest`.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          build-args: ANGULAR_CONFIGURATION=pruebas
+          tags: ${{ env.IMAGE_NAME }}:pruebas
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          cache-from: type=gha,scope=pruebas
+          cache-to: type=gha,scope=pruebas,mode=max
+
   deploy:
     # Un deploy normal tarda ~1 min, pero si cambian las dependencias hay que bajar capas nuevas de cientos de MB y la
     # descarga al VPS puede pasar de 10 min. Si algo de verdad se cuelga, se corta aqui en vez de gastar
@@ -82,4 +96,4 @@ jobs:
           EOF
           # El pull puede fallar de forma transitoria en el daemon del VPS
           # ("failed to lease content: NotFound"); se reintenta antes de rendirse.
-          ssh goagenda 'cd /opt/goagenda/frontend && for intento in 1 2 3; do timeout 420 docker compose pull && break; echo "pull fallo (intento $intento/3), reintentando en 15s"; [ "$intento" = 3 ] && exit 1; sleep 15; done && docker compose up -d --remove-orphans && docker image prune -f'
+          ssh goagenda 'cd /opt/goagenda/frontend && for intento in 1 2 3; do timeout 420 docker compose pull && break; echo "pull fallo (intento $intento/3), reintentando en 15s"; [ "$intento" = 3 ] && exit 1; sleep 15; done && docker compose up -d --remove-orphans && docker image prune -f && { if [ -d /opt/goagenda/pruebas ]; then cd /opt/goagenda/pruebas && docker compose pull app-pruebas && docker compose up -d app-pruebas || echo "pruebas no se pudo actualizar (no afecta a produccion)"; fi; }'
