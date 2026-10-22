@@ -5,12 +5,12 @@
  * produccion, asi que apunta a SU API y a SU proyecto de Supabase.
  * La API va en `api-pruebas` (un solo nivel): el certificado gratis de Cloudflare no cubre `pruebas.api.` (dos niveles).
  *
- * Supabase: hoy es el proyecto actual. Cuando P2 cree el proyecto de produccion, el actual pasa a ser el de
- * pruebas (no se migran sus datos) y `environment.prod.ts` pasa a las claves del proyecto nuevo.
+ * Supabase: proyecto propio de pruebas (esquema clonado del de produccion, sin datos de clientes). La clave es la
+ * publicable (publica por diseno, igual que en environment.prod.ts); la secreta vive solo en el .env del servidor.
  */
 export const environment = {
   production: true,
   goAgendaApiUrl: 'https://api-pruebas.goagenda.online',
-  supabaseUrl: 'https://ghwkiuwcovrmpztamjgz.supabase.co',
-  supabaseAnonKey: 'sb_publishable_UYyewNFK6XwIwTjyk6stZA_sfb5KXtX'
+  supabaseUrl: 'https://mivhmjztunqgawdwoyyb.supabase.co',
+  supabaseAnonKey: 'sb_publishable_uNLsfW5Tybhq8OMNLwwVUg_5LGt0z-L'
 };
